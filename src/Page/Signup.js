@@ -82,7 +82,9 @@ function Signup() {
     setloading(true);
     if (validate()) {
       try {
-        const response = await axios.post(`http://192.168.3.14:5000/api/register`, { Name: name, Mobilenumber: mobilenumber, Username: userName, Password: passWord });
+        // const response = await axios.post(`http://192.168.3.14:5000/api/register`, { Name: name, Mobilenumber: mobilenumber, Username: userName, Password: passWord });
+        const response = await axios.post(`http://192.168.1.10:5000/api/register`, { Name: name, Mobilenumber: mobilenumber, Username: userName, Password: passWord });
+
         setMessage(response.data.message);
         if (response.status === 201) {
           await delay(2000);

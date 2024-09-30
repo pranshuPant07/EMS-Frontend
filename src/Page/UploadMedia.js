@@ -9,7 +9,7 @@ function UploadMedia(props) {
             <div className='containerFORInput'>
                 <div className='headingANDBtn'>
                     <h1>UPLOAD</h1>
-                    <button onClick={props.onClosee}>X</button>
+                    <button onClick={props.onClose}>X</button>
                 </div>
                 <div className='InputFeildForMedia'>
                     <input type="file" accept=".xlsx, .xls" onChange={(e) => props.setFile(e.target.files[0])}/>

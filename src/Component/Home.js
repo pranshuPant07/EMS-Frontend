@@ -7,77 +7,89 @@ import Loader from './Loader';
 import axios from 'axios';
 
 function Home() {
-  const [Username, setUsername] = useState('');
-  const [Password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState('');
+  const [state, setState] = useState({
+    Username: '',
+    Password: '',
+    loading: false,
+    success: '',
+    showPassword: false,
+    errors: ''
+  });
+
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const navigate = useNavigate();
+
+  // Function to update state
+  const updateState = (newState) => {
+    setState(prevState => ({
+      ...prevState,
+      ...newState
+    }));
+  };
 
   //FUNCTION TO VALIDATE THE INPUT FIELD
   const validate = () => {
     const newErrors = [];
-    if (!Username.trim()) newErrors.Username = 'Username is required';
-    if (!Password) newErrors.password = 'Password is required';
 
-    setErrors(newErrors);
+    if (!state.Username.trim()) newErrors.Username = 'Username is required';
+    if (!state.Password) newErrors.password = 'Password is required';
+
+    updateState({ errors: newErrors }); // Update errors in state
     return !Object.keys(newErrors).length;
   };
 
-  //FUNCTION TO SHOW PASSWORD AND HIDE PASSWORD
+
+  // Function to show/hide password
   const handleCheckboxChange = () => {
-    setShowPassword(prevState => !prevState);
+    updateState(prevState => ({ showPassword: !prevState.showPassword }));
   };
 
-  //FUNCTION TO HANDLE LOGIN 
+  // Function to handle login
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    updateState({ loading: true });
+
     if (validate()) {
       try {
-        const response = await axios.post('http://192.168.3.14:5000/api/loginData', { Username: Username, Password: Password });
+        const response = await axios.post('http://192.168.1.10:5000/api/loginData', {
+          Username: state.Username,
+          Password: state.Password
+        });
         const { token } = response.data;
+
         if (token) {
-          setErrors('');
+          updateState({ errors: '', success: '' });
           localStorage.setItem('authToken', token);
           await delay(2000);
-          setLoading(false);
+          updateState({ loading: false });
+
           Swal.fire({
             title: "WELCOME",
-            text: "Login Sucessful",
+            text: "Login Successful",
             icon: "success"
           });
-          navigate('./Form', { replace: true });
+
+          navigate('/Form', { replace: true });
         }
       } catch (error) {
         // Handle errors
+        await delay(1000);
         if (error.response) {
-          // Server responded with a status other than 200 range
-          await delay(1000);
-          setErrors(error.response.data.message);
-          setSuccess('');
-          setLoading(false);
-
+          updateState({ errors: error.response.data.message, success: '', loading: false });
         } else {
-          // Something happened in setting up the request
-          await delay(1000);
-          setErrors('An unexpected error occurred.');
-          setSuccess('');
-          setLoading(false);
+          updateState({ errors: 'An unexpected error occurred.', success: '', loading: false });
         }
       }
     } else {
-      setLoading(false)
+      updateState({ loading: false });
     }
+  };
 
-  }
 
   return (
     <div className='main'>
       <>
-        {loading ? (
+        {state.loading ? (
           <Loader />
         ) : (
           <form className="form" onSubmit={handleLogin}>
@@ -88,39 +100,42 @@ function Home() {
                 type="text"
                 placeholder="Enter your username"
                 required=""
-                value={Username}
+                value={state.Username} // Updated to use state
                 onChange={(e) => {
-                  setUsername(e.target.value);
-                }} />
-              <span style={{ "color": "black" }}>Username</span>
-              {errors.Username && <p style={{ color: 'red' }}>{errors.Username}</p>}
+                  updateState({ Username: e.target.value }); // Update state
+                }}
+              />
+              <span style={{ color: "black" }}>Username</span>
+              {state.errors.Username && <p style={{ color: 'red' }}>{state.errors.Username}</p>} {/* Updated to use state */}
             </label>
             <label>
               <input
                 className="input"
-                type={showPassword ? 'text' : 'password'}
+                type={state.showPassword ? 'text' : 'password'} // Updated to use state
                 placeholder="Enter your password"
-                value={Password}
+                value={state.Password} // Updated to use state
                 onChange={(e) => {
-                  setPassword(e.target.value);
-                }} />
-              <span style={{ "color": "black" }}>Password</span>
-              {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
+                  updateState({ Password: e.target.value }); // Update state
+                }}
+              />
+              <span style={{ color: "black" }}>Password</span>
+              {state.errors.password && <p style={{ color: 'red' }}>{state.errors.password}</p>} {/* Updated to use state */}
             </label>
             <input
               type='checkbox'
               className='checkBox'
-              checked={showPassword}
-              onChange={handleCheckboxChange} />
+              checked={state.showPassword} // Updated to use state
+              onChange={handleCheckboxChange}
+            />
             <span className='showPassword'>Show Password</span>
             <button
-              className="submit">
+              className="submit"
+            >
               Login
             </button>
-            {errors && <p style={{ color: 'red', textAlign: "center" }}>{errors}</p>}
-            <p
-              className="signin">
-              Already have an acount ? <Link to="/Signup">Signup</Link>{" "}
+            {state.errors && <p style={{ color: 'red', textAlign: "center" }}>{state.errors}</p>} {/* Updated to use state */}
+            <p className="signin">
+              Already have an account? <Link to="/Signup">Signup</Link>{" "}
             </p>
           </form>
         )}

@@ -1,0 +1,138 @@
+.addPageMain {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.inputAreaAgain {
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background-color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.headingAndButton {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.headingAndButton h1 {
+    font-size: 16px;
+    margin: 0;
+    font-family: "Mukta", sans-serif;
+    font-weight: 700;
+    color: #f0f0f0;
+}
+
+.headingAndButton button {
+    border-radius: 5px;
+    background-color: #f44336;
+    border: none;
+    width: 30px;
+    padding: 6px 10px;
+    color: white;
+    font-family: "Mukta", sans-serif;
+    transition: background-color 0.3s, transform 0.3s;
+    margin-top: 10px;
+}
+
+.headingAndButton button:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
+
+.area {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.area select {
+    width: 100%;
+    padding: 12px;
+}
+
+.area input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #fff;
+    font-size: 16px;
+}
+
+.area input:focus {
+    outline: none;
+    border-color: #2196f3;
+}
+
+.area button {
+    width: 50%;
+    background-color: #2196f3;
+    padding: 12px;
+    border-radius: 5px;
+    color: white;
+    border: none;
+    font-family: "Mukta", sans-serif;
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 16px;
+}
+
+.area button:hover {
+    background-color: #1976d2;
+    transform: scale(1.03);
+}
+
+@media only screen and (max-width: 480px) {
+    .inputAreaAgain {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .headingAndButton h1 {
+        font-size: 20px;
+    }
+
+    .headingAndButton button.close-btn {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+    }
+
+    .area {
+        margin-top: 12px
+    }
+
+    .area input {
+        font-size: 16px;
+    }
+
+    .area button {
+        width: 60%;
+        font-size: 18px;
+    }
+
+    #select-input {
+        width: 100%;
+        height: 40px;
+    }
+}

@@ -15,62 +15,64 @@ import UploadMedia from '../Page/UploadMedia';
 import ErrorDisplay from '../Page/ErrorDisplay';
 import View from '../Page/View';
 import Verification from '../Page/Verification';
+import AddandUpdate from './AddandUpdate';
 
 function Form() {
-  const [modal, setModal] = useState(false);
-  const [Name, setempName] = useState('');
-  const [Mobilenumber, setempMobileNumber] = useState('');
-  const [Employee, setEmployee] = useState([]);
-  const [photo, setPhoto] = useState(null);
-  const [isEditing, SetIsEditing] = useState(false);
-  const [userID, setUserID] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [Namee, setNamee] = useState('');
-  const [option, setOptions] = useState('')
-  const [Mobilenumberr, setMobilenumberr] = useState('');
-  const [Errors, setErrors] = useState('');
-  const [date, setDate] = useState('');
-  const [datalogout, setDatalogout] = useState(true);
-  const [uploadModal, setUploadModal] = useState(false);
-  const [file, setFile] = useState(null);
-  const [message, setMessage] = useState('');
-  const totalPosts = Employee.length;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(6);
+  const [state, setState] = useState({
+    modal: false,
+    Name: '',
+    Mobilenumber: '',
+    Employee: [],
+    photo: null,
+    isEditing: false,
+    userID: '',
+    loading: false,
+    Namee: '',
+    option: '',
+    Mobilenumberr: '',
+    Errors: '',
+    date: '',
+    datalogout: true,
+    uploadModal: false,
+    file: null,
+    message: '',
+    currentPage: 1,
+    postsPerPage: 6,
+    response: [],
+    ErrorModal: false,
+    processing: false,
+    errorMessage: '',
+    selectedEmp: '',
+    selectedOption: '',
+    searchTerm: '',
+    ViewModal: false,
+    verifyModal: false,
+    code: '',
+    errorInVerification: '',
+    mode: '',
+    popupModal: false,
+  });
 
-  const [response, setResponse] = useState([]);
-  const [ErrorModal, setErrorModal] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [selectedEmp, setSeletedEmp] = useState('');
-  const [selectedOption, setSelectedOption] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [ViewModal, setViewModal] = useState(false);
-  const [verifyModal, setVerifyModal] = useState(false);
-  const [code, setCode] = useState('');
-  const [errorInVerification, setErrorInVerification] = useState('');
-
-  //STATES FOR EDITING USER
-  const [upName, setupName] = useState('');
-  const [upMobilenumber, setupMobileNumber] = useState('');
-  const [upDateofjoin, setupDateOfJoin] = useState('');
-  const [upErrors, setupErrors] = useState('');
-  const [upupdatedPhoto, setupUpdatedPhoto] = useState(null);
-  const [upupdatedDepartment, setupUpdatedDepartment] = useState('');
+  // Update state function
+  const updateState = (newState) => {
+    setState(prevState => ({ ...prevState, ...newState }));
+  };
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const LastPostIndex = currentPage * postsPerPage;
-  const firstPostIndex = LastPostIndex - postsPerPage;
+  // Pagination calculations
+  const LastPostIndex = state.currentPage * state.postsPerPage;
+  const firstPostIndex = LastPostIndex - state.postsPerPage;
+  const totalPosts = state.Employee.length;
 
-  //Filtering and Sorting
-  const filteredEmployees = Employee.filter(employee => {
+  // Filtering and Sorting
+  const filteredEmployees = state.Employee.filter(employee => {
     const mobileNumberString = String(employee.Mobilenumber);
-    const isNumericSearchTerm = !isNaN(searchTerm) && searchTerm.trim() !== '';
+    const isNumericSearchTerm = !isNaN(state.searchTerm) && state.searchTerm.trim() !== '';
 
-    const matchesSearchTerm = employee.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (isNumericSearchTerm && mobileNumberString.includes(searchTerm));
-    const matchesDepartment = selectedOption === '' || employee.Department === selectedOption;
+    const matchesSearchTerm = employee.Name.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+      (isNumericSearchTerm && mobileNumberString.includes(state.searchTerm));
+    const matchesDepartment = state.selectedOption === '' || employee.Department === state.selectedOption;
 
     return matchesSearchTerm && matchesDepartment;
   });
@@ -78,41 +80,20 @@ function Form() {
   const currentEmployees = filteredEmployees.slice(firstPostIndex, LastPostIndex);
 
   const navigate = useNavigate();
-  const hasData = Employee.length > 0;
+  const hasData = state.Employee.length > 0;
 
-  //USEEFFECT TO FETCH EMPLOYEE DATA
+  // Fetch user data
   useEffect(() => {
-    // Fetch user data from an API
     fetchuserData();
   }, []);
 
-  //USEEFFECT TO FETCH TODAY's DATE
+  // Fetch today's date
   useEffect(() => {
-    // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
-    formatDate(setDate(today));
+    updateState({ date: today });
   }, []);
 
-  //USEEFFECT TO FETCH SELECETED EMPLOYEE USING IT'S USERID AND DISPLAY THAT FETCHED USER DETAILS IN EDIT FORM POPUP
-  useEffect(() => {
-    if (userID && isEditing) {
-      const fetchUserDetails = async () => {
-        try {
-          const response = await axios.get(`http://192.168.3.14:5000/api/employees/${userID}`);
-          const user = response.data;
-          setupName(user.Name);
-          setupMobileNumber(user.Mobilenumber);
-          setupUpdatedDepartment(user.Department);
-          setupDateOfJoin(user.Dateofjoin);
-        } catch (error) {
-          console.error('Error fetching user details:', error);
-        }
-      };
-
-      fetchUserDetails();
-    }
-  }, [userID, isEditing]);
-
+  // Options for department
   const options = [
     { value: '', label: 'Select' },
     { value: 'Manager', label: 'Manager' },
@@ -123,99 +104,64 @@ function Form() {
     { value: 'Support Department', label: 'Support Department' },
     { value: 'Sales Department', label: 'Sales Department' },
     { value: 'Helper', label: 'Helper' }
-  ]
+  ];
 
-  const resetForm = () => {
-    setNamee("");
-    setempMobileNumber("");
-    setOptions("");
-    setDate(new Date());
-    setPhoto(null);
-    setErrors('');
-  };
-
-  //FUNCTION FOR FILTER AND SORTING
+  // Search query handler
   const searchByQuery = (e) => {
-    const query = e.target.value;
-    setSearchTerm(query);
+    updateState({ searchTerm: e.target.value });
   };
 
-  //FUNCTION TO HANDLE EDIT BUTTON CLICK
+  // Handle edit button click
   const handleEditClick = (e, userId) => {
     e.stopPropagation();
-    setUserID(userId);
-    SetIsEditing(true);
+    updateState({ userID: userId, isEditing: true });
   };
 
-  //FUNCTION TO HANDLE SEARCH BY DEPARTMENT FROM OPTIONS FOR FILTERATION
+  // Handle search by department
   const handleSearchByDepartment = (e) => {
-    setSelectedOption(e.target.value);
+    updateState({ selectedOption: e.target.value });
   };
 
-  //FUNCTION TO REFRESH EMPLOYEE DATA AFTER EMPLOYEE DATA UPDATED
+  // Refresh employee data
   const handleUpdate = () => {
-    // Logic to refresh user data if needed
     fetchuserData();
   };
 
-  //FUNCTION FOR MAKING A UPLOAD POPUP MODAL TRUE
+  // Open upload modal
   const UploadEmp = async () => {
-    setUploadModal(true)
-  }
+    updateState({ uploadModal: true });
+  };
 
-  //FUNCTION TO GET SERIAL NUMBER
+  // Get serial number
   const getSerialNumber = (index) => {
-    return (currentPage - 1) * 6 + index + 1;
+    return (state.currentPage - 1) * state.postsPerPage + index + 1;
   };
 
-  //FUNCTION TO HANDLE VIEW POPUP ON CLICK
+  // Handle view popup
   const handle_View = async (id) => {
-    setSeletedEmp(id);
-    setViewModal(true)
-  }
+    updateState({ selectedEmp: id, ViewModal: true });
+  };
 
-  //FUCTION TO FETCH USER DATA FROM DATABASE
-  const fetchuserData = async (e) => {
+  // Fetch user data
+  const fetchuserData = async () => {
     try {
-      const response = await axios.get("http://192.168.3.14:5000/api/users");
+      const response = await axios.get("http://192.168.1.10:5000/api/users");
       const data = await response.data;
-      setEmployee(data);
+      updateState({ Employee: data });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
-
-  //FUNCTION TO VALIDATE INPUT FIELDS  
-  const validate = () => {
-    const newErrors = [];
-
-    // Validate username
-    if (!Name.trim()) {
-      newErrors.Namee = 'Name is required';
-    }
-    // Validate Mobilenumber
-    if (!Mobilenumber) {
-      newErrors.mobileNumber = 'Mobile number is required';
-    } else if (!/^\d{10}$/.test(Mobilenumber)) {
-      newErrors.mobileNumber = 'Mobile number must be 10 digits';
-    }
-
-    setErrors(newErrors);
-    // Return true if no errors
-    return Object.keys(newErrors).length === 0;
   };
 
-  //FUNCTION TO HANDLE CLOSE MODAL
+  // Close modal
   const handleCloseModal = () => {
-    SetIsEditing(false);
-    setUserID(null);
+    updateState({ isEditing: false, userID: null });
   };
 
-  //Function to Handle Delete
+  // Handle delete
   const handleDelete = async (e, id) => {
     e.stopPropagation();
-    setLoading(true);
-    setDatalogout(false)
+    updateState({ loading: true, datalogout: false });
     try {
       const result = await Swal.fire({
         title: "Are you sure?",
@@ -229,200 +175,89 @@ function Form() {
 
       if (result.isConfirmed) {
         await delay(1000);
-        await deletee(id); // Call the delete function
+        await deletee(id);
         Swal.fire({
           title: "Deleted!",
           text: "Employee's data has been deleted.",
           icon: "success",
         });
       }
-
     } catch (error) {
-      // Optionally handle errors
       console.error('Error occurred during delete:', error);
     } finally {
-      setLoading(false);
-      setDatalogout(true);
+      updateState({ loading: false, datalogout: true });
     }
   };
 
-  // FUNCTION TO DELETE EMPLOYEE DATA FROM DATABASE  
+  // Delete employee data
   const deletee = async (id) => {
     try {
-      await axios.delete(`http://192.168.3.14:5000/api/items/${id}`);
+      await axios.delete(`http://192.168.1.10:5000/api/items/${id}`);
       fetchuserData();
-      setLoading(false)
     } catch (error) {
       console.error('There was an error deleting the item!', error);
-      setLoading(false)
     }
   };
 
-  //FUNCTION TO LOGOUT FROM FORM PAGE TO LOGIN PAGE
+  // Logout
   const logout = (e) => {
-    setDatalogout(false)
+    updateState({ datalogout: false });
     Swal.fire({
       title: "Are you sure?",
-      text: "you want to log out",
+      text: "You want to log out",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "logout"
+      confirmButtonText: "Logout"
     }).then(async (result) => {
       if (result.isConfirmed) {
-        setLoading(true);
-        localStorage.removeItem('authToken'); // Remove token from localStorage
+        updateState({ loading: true });
+        localStorage.removeItem('authToken');
         await delay(1500);
-        setLoading(false);
+        updateState({ loading: false });
         navigate("/", { replace: true });
-      }
-      else {
-        setDatalogout(true)
-      }
-    });
-  }
-
-  //FUNCTION TO ADD EMPLOYEE DATA TO DATABASE
-  const addData = async (e) => {
-    e.preventDefault();
-    setDatalogout(false);
-    setLoading(true);
-
-    if (validate()) {
-      try {
-        const formData = new FormData();
-        formData.append('Name', Name);
-        formData.append('Mobilenumber', Mobilenumber);
-        formData.append('Department', option)
-        formData.append('Dateofjoin', formatDate(date));
-        if (photo) {
-          formData.append('photo', photo);
-        }
-
-        await axios.post("http://192.168.3.14:5000/api/signup", formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        setErrors('');
-        setModal(false);
-        setTimeout(() => {
-          setLoading(false);
-          setDatalogout(true);
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: 'Employee data has been saved',
-            showConfirmButton: false,
-            timer: 1200,
-          });
-        }, 2000)
-        resetForm();
-        fetchuserData();
-      } catch (error) {
-        setErrors(error.response?.data?.error || 'Error occurred');
-        setLoading(false);
-        setDatalogout(true);
-        fetchuserData();
-      }
-    } else {
-      setLoading(false);
-      setDatalogout(true);
-      fetchuserData();
-    }
-
-    await delay(1200);
-    window.scrollTo({
-      top: 0, // Scroll to the top of the page
-      behavior: 'smooth', // Smooth scrolling effect
-    });
-
-  };
-
-  //FUNCTION TO HANDLE UPDATE
-  const handleUpdates = async (e) => {
-    e.preventDefault();
-    setErrorInVerification("");
-    setLoading(true);
-
-    try {
-      // Verify the code first
-      const res = await axios.post("http://192.168.3.14:5000/api/verify", { code: code });
-      if (res.status === 200) {
-        setVerifyModal(false);
-        const formData = new FormData();
-        formData.append('Name', upName);
-        formData.append('Dateofjoin', formatDate(upDateofjoin));
-        formData.append('Department', upupdatedDepartment);
-        if (upupdatedPhoto) {
-          formData.append('photo', upupdatedPhoto);
-        }
-
-        setDatalogout(false);
-
-        await axios.put(`http://192.168.3.14:5000/update-user/${userID}`, formData);
-        setCode("");
-
-        await delay(1200);
-        setLoading(false);
-        setDatalogout(true);
-        Swal.fire({
-          title: "SUCCESS",
-          text: "Updated data has been saved",
-          icon: "success"
-        });
-
-        fetchuserData();
-      }
-    } catch (error) {
-      setLoading(false);
-      if (error.response) {
-        const errorMessage = error.response.data.message || "An error occurred during verification.";
-        setErrorInVerification(errorMessage);
       } else {
-        Swal.fire('Error', 'No response from the server.', 'error');
+        updateState({ datalogout: true });
       }
-    } finally {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
+    });
   };
 
-  //FUNCTION TO HANDLE UPLOADING EXCEL FILE DATA TO DATABASE
-  const onUpload = async () => {
+  // Handle adding employee
+  const HandleAddEmp = (e) => {
+    e.stopPropagation();
+    updateState({ popupModal: true, mode: "Add" });
+  };
 
-    if (!file) {
-      setMessage('Please choose a file first.');
+  // Handle editing employee
+  const handleEditEmp = (e, id) => {
+    e.stopPropagation();
+    updateState({ userID: id, popupModal: true, mode: "Edit" });
+  };
+
+  // Handle file upload
+  const onUpload = async () => {
+    if (!state.file) {
+      updateState({ message: 'Please choose a file first.' });
       return;
     }
-    setLoading(true);
-    setDatalogout(false);
+    updateState({ loading: true, datalogout: false });
     try {
-      setUploadModal(false);
-      setProcessing(true);
+      updateState({ uploadModal: false, processing: true });
       await delay(1000);
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', state.file);
 
-      // Perform the file upload
-      const response = await axios.post('http://192.168.3.14:5000/upload', formData, {
+      const response = await axios.post('http://192.168.1.10:5000/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
       const { data } = response;
-      console.log('Upload response data:', data);
-
       if (data.invalidEmployees.length > 0) {
-        setResponse(data.invalidEmployees);
-        setErrorMessage(data.errorMessage || 'Some records are invalid or already exist');
-        setErrorModal(true);
+        updateState({ response: data.invalidEmployees, errorMessage: data.errorMessage || 'Some records are invalid or already exist', ErrorModal: true });
       } else {
         await delay(1200);
         Swal.fire({
@@ -432,9 +267,8 @@ function Form() {
           showConfirmButton: false,
           timer: 1200,
         });
-        fetchuserData()
+        fetchuserData();
       }
-
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -442,21 +276,13 @@ function Form() {
         text: `Error uploading file: ${error.response?.data || error.message}`,
       });
     } finally {
-
-      setLoading(false);
-      setProcessing(false);
-      setDatalogout(true);
-      fetchuserData(); // Update the employee data
-      setUploadModal(false); // Ensure the upload modal is closed
-      setFile(null);
-      setMessage('')
+      updateState({ loading: false, processing: false, datalogout: true, uploadModal: false, file: null, message: '' });
     }
-  }
+  };
 
-  //FUNCTION TO HANDLE EXPORTING DATA FROM DATABASE
+  // Handle exporting data
   const handleExport = async () => {
-    setLoading(true)
-    setDatalogout(false)
+    updateState({ loading: true, datalogout: false });
     Swal.fire({
       title: "Do you want to download the file?",
       showDenyButton: true,
@@ -464,16 +290,16 @@ function Form() {
       confirmButtonText: "EXCEL",
       denyButtonText: `PDF`
     }).then(async (result) => {
-      setLoading(true)
+      updateState({ loading: true });
       if (result.isConfirmed) {
         Swal.fire({
           title: "Done!",
-          text: "Your file will be avaiable for download shortly.",
+          text: "Your file will be available for download shortly.",
           icon: "info"
         });
         await delay(3000);
         axios({
-          url: 'http://192.168.3.14:5000/export/employees',
+          url: 'http://192.168.1.10:5000/export/employees',
           method: 'GET',
           responseType: 'blob',
         }).then((response) => {
@@ -486,44 +312,38 @@ function Form() {
         }).catch((error) => {
           console.error('Error exporting data:', error);
         });
-        setLoading(false)
-        setDatalogout(true);
+        updateState({ loading: false, datalogout: true });
       } else if (result.isDenied) {
-        setLoading(true)
+        updateState({ loading: true });
         Swal.fire({
           title: "Done!",
-          text: "Your file will be avaiable for download shortly.",
+          text: "Your file will be available for download shortly.",
           icon: "info"
         });
         await delay(3000);
         try {
-          const response = await axios.get('http://192.168.3.14:5000/download-employees', {
-            responseType: 'blob', // Important for handling binary data
+          const response = await axios.get('http://192.168.1.10:5000/download-employees', {
+            responseType: 'blob',
           });
 
           const url = window.URL.createObjectURL(new Blob([response.data]));
           const link = document.createElement('a');
           link.href = url;
-          link.setAttribute('download', 'employees.pdf'); // Set the file name
+          link.setAttribute('download', 'employees.pdf');
           document.body.appendChild(link);
           link.click();
-          link.remove(); // Remove the link element after the download
-
-          // Optionally, you could also revoke the object URL after use
+          link.remove();
           window.URL.revokeObjectURL(url);
         } catch (error) {
           console.error('Error downloading the PDF:', error);
-          // Handle errors as needed
         }
-        setLoading(false)
-        setDatalogout(true)
-      }
-      else {
-        setLoading(false)
-        setDatalogout(true)
+        updateState({ loading: false, datalogout: true });
+      } else {
+        updateState({ loading: false, datalogout: true });
       }
     });
-  }
+  };
+
 
   return (
     <div className='formMain'>
@@ -534,9 +354,7 @@ function Form() {
           <div className='buttonToaddeMployee'>
             <button
               className="buttonsForAdd"
-              onClick={() => {
-                setModal(true)
-              }}>ADD</button>
+              onClick={HandleAddEmp}>ADD</button>
             <button
               className='buttonsForUpload'
               onClick={UploadEmp}>
@@ -564,9 +382,7 @@ function Form() {
               </a>
               <ul className="dropdown-menu">
                 <li key={"1"}>
-                  <a className="dropdown-item" id='firstt' onClick={() => {
-                    setModal(true)
-                  }}>
+                  <a className="dropdown-item" id='firstt' onClick={HandleAddEmp}>
                     ADD EMPLOYEE
                   </a>
                 </li>
@@ -607,7 +423,7 @@ function Form() {
           </div>
 
 
-          {loading ? (
+          {state.loading ? (
             <Loader />
           ) : (
             <table key={"table"} style={{ margin: "0" }} className="table table-dark table-striped table-hover">
@@ -641,9 +457,9 @@ function Form() {
                         <td className='cenTer'>
                           <div className='buttons_space'>
                             <button className='edit_Button'
-                              onClick={(e) => {
-                                handleEditClick(e, item._id)
-                              }}
+                              onClick={(e) =>
+                                handleEditEmp(e, item._id)}
+                            // handleEditClick(e, item._id)
                             >Edit</button>
 
                             <button className='delete_Button'
@@ -657,108 +473,73 @@ function Form() {
                   )
                 }))}
             </table>)}
-          {datalogout && hasData &&
+          {state.datalogout && hasData && (
             <Pagination
               totalPosts={totalPosts}
-              postsPerPage={postsPerPage}
-              setCurrentPage={setCurrentPage}
-              currentPage={currentPage}
-            />}
+              postsPerPage={state.postsPerPage}
+              setCurrentPage={(page) => updateState({ currentPage: page })}
+              currentPage={state.currentPage}
+            />
+          )}
         </div>
 
       </div>
-
-      {
-        modal &&
-        <FormToAdd
-          onClose={() => setModal(false)}
-          setempName={setempName}
-          setempMobileNumber={setempMobileNumber}
-          Employee={Employee}
-          addData={addData}
-          Mobilenumber={Mobilenumber}
-          Namee={Namee}
-          Mobilenumberr={Mobilenumberr}
-          Errors={Errors}
-          setDate={setDate}
-          date={date}
-          setPhoto={setPhoto}
-          setErrors={setErrors}
-          setOptions={setOptions}
-          option={options}
+      {state.popupModal && (
+        <AddandUpdate
+          mode={state.mode}
+          onClose={() => updateState({ popupModal: false })}
+          setLoading={(loading) => updateState({ loading })}
+          setDatalogout={(datalogout) => updateState({ datalogout })}
+          setpopupModal={(popupModal) => updateState({ popupModal })}
+          setVerifyModal={(verifyModal) => updateState({ verifyModal })}
+          code={state.code}
+          setCode={(code) => updateState({ code })}
+          userID={state.userID}
+          fetchuserData={fetchuserData}
+          setErrorInVerification={(error) => updateState({ errorInVerification: error })}
         />
-      }
-      {
-        isEditing &&
-        <EditUser
-          isOpen={isEditing}
-          onUpdate={handleUpdate}
-          handleEditClick={handleEditClick}
-          onClose={handleCloseModal}
-          onClosee={() => SetIsEditing(false)}
-          setDatalogout={setDatalogout}
-          setViewModal={setViewModal}
-          setVerifyModal={setVerifyModal}
-          setCode={setCode}
-          code={code}
-          SetIsEditing={SetIsEditing}
-          handleUpdates={handleUpdates}
+      )}
 
-          setName={setupName}
-          setMobileNumber={setupMobileNumber}
-          setDateOfJoin={setupDateOfJoin}
-          setErrors={setupErrors}
-          setUpdatedPhoto={setupUpdatedPhoto}
-          setUpdatedDepartment={setupUpdatedDepartment}
-
-          Name={upName}
-          Mobilenumber={upMobilenumber}
-          Dateofjoin={upDateofjoin}
-          Errors={upErrors}
-          updatedDepartment={upupdatedDepartment}
-        />
-      }
-      {
-        uploadModal &&
+      {state.uploadModal && (
         <UploadMedia
-          onClosee={() => setUploadModal(false)}
+          onClose={() => updateState({ uploadModal: false })}
           onUpload={onUpload}
-          message={message}
-          setMessage={setMessage}
-          loading={loading}
-          setLoading={setLoading}
-          setFile={setFile}
+          message={state.message}
+          setMessage={(message) => updateState({ message })}
+          loading={state.loading}
+          setLoading={(loading) => updateState({ loading })}
+          setFile={(file) => updateState({ file })}
         />
-      }
-      {
-        ErrorModal &&
+      )}
+
+      {state.ErrorModal && (
         <ErrorDisplay
-          onClose={() => setErrorModal(false)}
-          response={response}
-          errorMessage={errorMessage}
+          onClose={() => updateState({ ErrorModal: false })}
+          response={state.response}
+          errorMessage={state.errorMessage}
         />
-      }
-      {
-        ViewModal &&
+      )}
+
+      {state.ViewModal && (
         <View
-          onClose={() => setViewModal(false)}
-          selectedEmp={selectedEmp}
+          onClose={() => updateState({ ViewModal: false })}
+          selectedEmp={state.selectedEmp}
           handleEditClick={handleEditClick}
           handleDelete={handleDelete}
         />
-      }
-      {verifyModal &&
+      )}
+
+      {state.verifyModal && (
         <Verification
-          code={code}
-          setCode={setCode}
+          code={state.code}
+          setCode={(code) => updateState({ code })}
           handleUpdate={handleUpdate}
-          setVerifyModal={setVerifyModal}
-          handleUpdates={handleUpdates}
-          SetIsEditing={SetIsEditing}
-          errorInVerification={errorInVerification}
-          setErrorInVerification={setErrorInVerification}
+          setVerifyModal={(verifyModal) => updateState({ verifyModal })}
+          SetIsEditing={(isEditing) => updateState({ isEditing })}
+          errorInVerification={state.errorInVerification}
+          setErrorInVerification={(error) => updateState({ errorInVerification: error })}
         />
-      }
+      )}
     </div>
   )
 }
