@@ -53,14 +53,12 @@ function Form() {
     popupModal: false,
   });
 
-  // Update state function
   const updateState = (newState) => {
     setState(prevState => ({ ...prevState, ...newState }));
   };
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  // Pagination calculations
   const LastPostIndex = state.currentPage * state.postsPerPage;
   const firstPostIndex = LastPostIndex - state.postsPerPage;
   const totalPosts = state.Employee.length;

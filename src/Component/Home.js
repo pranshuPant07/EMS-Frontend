@@ -119,12 +119,12 @@ function Home() {
                 }}
               />
               <span style={{ color: "black" }}>Password</span>
-              {state.errors.password && <p style={{ color: 'red' }}>{state.errors.password}</p>} {/* Updated to use state */}
+              {state.errors.password && <p style={{ color: 'red' }}>{state.errors.password}</p>} 
             </label>
             <input
               type='checkbox'
               className='checkBox'
-              checked={state.showPassword} // Updated to use state
+              checked={state.showPassword}
               onChange={handleCheckboxChange}
             />
             <span className='showPassword'>Show Password</span>
@@ -133,7 +133,7 @@ function Home() {
             >
               Login
             </button>
-            {state.errors && <p style={{ color: 'red', textAlign: "center" }}>{state.errors}</p>} {/* Updated to use state */}
+            {state.errors && <p style={{ color: 'red', textAlign: "center" }}>{state.errors}</p>}
             <p className="signin">
               Already have an account? <Link to="/Signup">Signup</Link>{" "}
             </p>

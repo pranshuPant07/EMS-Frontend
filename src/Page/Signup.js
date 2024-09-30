@@ -31,7 +31,6 @@ function Signup() {
   const validate = () => {
     const newErrors = {};
 
-    // Validate name
     if (!name.trim()) {
       newErrors.name = 'Name is required';
     }
@@ -39,7 +38,6 @@ function Signup() {
       newErrors.username = 'Username is required';
     }
 
-    // Validate mobile number
     if (!mobilenumber) {
       newErrors.mobileNumber = 'Mobile number is required';
     } else if (!/^\d{10}$/.test(mobilenumber)) {
@@ -50,7 +48,6 @@ function Signup() {
       newErrors.passWord = 'Password is required';
     }
 
-    // Validate confirm password
     if (passWord !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }

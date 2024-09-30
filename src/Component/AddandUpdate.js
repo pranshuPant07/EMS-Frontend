@@ -66,7 +66,7 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
 
     const validate = () => {
         setErrorMessage('');
-    
+
         if (!input.Name.trim()) {
             setErrorMessage('All fields are required.');
             return false;
@@ -90,7 +90,7 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
             setErrorMessage('All fields are required.');
             return false;
         }
-    
+
         return true; // No errors
     };
 
@@ -121,8 +121,8 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
     };
 
     const functiontoclose = () => {
-        toResetInput(); // Reset input fields on close
-        onClose(); // Close the popup
+        toResetInput();
+        onClose();
     };
 
     const DateSelect = (e) => {
@@ -237,14 +237,14 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
                         placeholder='Enter your name'
                         name="Name"
                         onChange={handleInputChange} />
-                    {/* {errors.Name && <p style={{ color: 'red' }}>{errors.Name}</p>} */}
+
                     <input
                         type='number'
                         value={input.Mobilenumber}
                         placeholder='Enter your mobile number'
                         onChange={updateMobilenumber}
                     />
-                    {/* {errors.Mobilenumber && <p style={{ color: 'red' }}>{errors.Mobilenumber}</p>} */}
+
                     <select
                         id="select-input"
                         name="Department"
@@ -257,7 +257,6 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
                             </option>
                         ))}
                     </select>
-                    {/* {errors.Department && <p style={{ color: 'red' }}>{errors.Department}</p>} */}
 
                     <input
                         type='file'
@@ -266,7 +265,7 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
                         accept='image/*'
                         onChange={handleFileChange}
                     />
-                    {/* {errors.Photo && <p style={{ color: 'red' }}>{errors.Photo}</p>} */}
+
 
                     <input
                         type='date'
@@ -274,7 +273,7 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
                         placeholder='Enter your date of join'
                         name='Dateofjoin'
                         onChange={DateSelect} />
-                    {/* {errors.Dateofjoin && <p style={{ color: 'red' }}>{errors.Dateofjoin}</p>} */}
+
                     {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
 
                     <button onClick={handleSubmit}>{mode === 'Edit' ? 'Update' : 'Add'}</button>
