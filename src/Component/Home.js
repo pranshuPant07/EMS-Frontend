@@ -35,19 +35,19 @@ function Home({ setIsAuthenticated }) {
     e.preventDefault();
     setLoading(true);
     setApiError('');
-  
+
     try {
       const response = await axios.post('http://192.168.3.14:5000/api/loginData', {
         Username: data.userName,
         Password: data.Password,
       });
-  
+
       const { token } = response.data;
-  
+
       if (token) {
         localStorage.setItem('authToken', token);
         setIsAuthenticated(true);
-  
+
         setTimeout(() => {
           Swal.fire({
             title: "WELCOME",
@@ -68,8 +68,8 @@ function Home({ setIsAuthenticated }) {
       }
     }
   };
-  
-  
+
+
 
   return (
     <div className='main'>
