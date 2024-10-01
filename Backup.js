@@ -916,3 +916,370 @@
 // }
 
 // export default EditUser
+
+// /* eslint-disable no-unused-vars */
+// import { useEffect, useState } from 'react';
+// import '../Style/Home.css';
+// import { Link, useNavigate } from "react-router-dom";
+// import Swal from 'sweetalert2';
+// import Loader from './Loader';
+// import axios from 'axios';
+
+// function Home({ setIsAuthenticated }) {
+//   const [state, setState] = useState({
+//     Username: '',
+//     Password: '',
+//     loading: false,
+//     success: '',
+//     showPassword: false,
+//     errors: ''
+//   });
+
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const token = localStorage.getItem('authToken');
+//     if (token) {
+//       navigate('/Form'); // Redirect to Form if already authenticated
+//     }
+//   }, [navigate]);
+
+//   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+
+//   // Function to update state
+//   const updateState = (newState) => {
+//     setState(prevState => ({
+//       ...prevState,
+//       ...newState
+//     }));
+//   };
+
+//   //FUNCTION TO VALIDATE THE INPUT FIELD
+//   const validate = () => {
+//     const newErrors = [];
+
+//     if (!state.Username.trim()) newErrors.Username = 'Username is required';
+//     if (!state.Password) newErrors.password = 'Password is required';
+
+//     updateState({ errors: newErrors }); // Update errors in state
+//     return !Object.keys(newErrors).length;
+//   };
+
+
+//   // Function to show/hide password
+//   const handleCheckboxChange = () => {
+//     updateState(prevState => ({ showPassword: !prevState.showPassword }));
+//   };
+
+//   // Function to handle login
+//   const handleLogin = async (e) => {
+//     e.preventDefault();
+//     updateState({ loading: true });
+
+//     if (validate()) {
+//       try {
+//         const response = await axios.post('http://192.168.3.14:5000/api/loginData', {
+//           // const response = await axios.post('http://192.168.1.10:5000/api/loginData', {
+//           Username: state.Username,
+//           Password: state.Password
+//         });
+//         const { token } = response.data;
+
+//         if (token) {
+//           updateState({ errors: '', success: '' });
+//           localStorage.setItem('authToken', token);
+//           setIsAuthenticated(true);
+//           await delay(2000);
+//           updateState({ loading: false });
+
+//           Swal.fire({
+//             title: "WELCOME",
+//             text: "Login Successful",
+//             icon: "success"
+//           });
+//           navigate('/Form', { replace: true });
+//         }
+//       } catch (error) {
+//         // Handle errors
+//         await delay(1000);
+//         if (error.response) {
+//           updateState({ errors: error.response.data.message, success: '', loading: false });
+//         } else {
+//           updateState({ errors: 'An unexpected error occurred.', success: '', loading: false });
+//         }
+//       }
+//     } else {
+//       updateState({ loading: false });
+//     }
+//   };
+
+
+//   return (
+//     <div className='main'>
+//       <>
+//         {state.loading ? (
+//           <Loader />
+//         ) : (
+//           <form className="form" onSubmit={handleLogin}>
+//             <p className="title">Login</p>
+//             <label>
+//               <input
+//                 className="input"
+//                 type="text"
+//                 placeholder="Enter your username"
+//                 required=""
+//                 value={state.Username} // Updated to use state
+//                 onChange={(e) => {
+//                   updateState({ Username: e.target.value }); // Update state
+//                 }}
+//               />
+//               <span style={{ color: "black" }}>Username</span>
+//               {state.errors.Username && <p style={{ color: 'red' }}>{state.errors.Username}</p>} {/* Updated to use state */}
+//             </label>
+//             <label>
+//               <input
+//                 className="input"
+//                 type={state.showPassword ? 'text' : 'password'} // Updated to use state
+//                 placeholder="Enter your password"
+//                 value={state.Password} // Updated to use state
+//                 onChange={(e) => {
+//                   updateState({ Password: e.target.value }); // Update state
+//                 }}
+//               />
+//               <span style={{ color: "black" }}>Password</span>
+//               {state.errors.password && <p style={{ color: 'red' }}>{state.errors.password}</p>}
+//             </label>
+//             <input
+//               type='checkbox'
+//               className='checkBox'
+//               checked={state.showPassword}
+//               onChange={handleCheckboxChange}
+//             />
+//             <span className='showPassword'>Show Password</span>
+//             <button
+//               className="submit"
+//             >
+//               Login
+//             </button>
+//             {state.errors && <p style={{ color: 'red', textAlign: "center" }}>{state.errors}</p>}
+//             <p className="signin">
+//               Already have an account? <Link to="/Signup">Signup</Link>{" "}
+//             </p>
+//           </form>
+//         )}
+//       </>
+//     </div>
+//   )
+// }
+
+// export default Home
+
+
+
+// /* eslint-disable no-lone-blocks */
+// import React, { useState } from 'react'
+// import './../Style/Signup.css'
+// import Swal from 'sweetalert2';
+// import { Link, useNavigate } from 'react-router-dom';
+// import axios from 'axios';
+// import Loader from '../Component/Loader';
+
+
+// function Signup() {
+//   const [name, setName] = useState('');
+//   const [mobilenumber, setmobileNumber] = useState('');
+//   const [userName, setuserName] = useState('');
+//   const [passWord, setpassWord] = useState('');
+//   const [confirmPassword, setconfirmpassword] = useState('');
+//   const [message, setMessage] = useState('');
+//   const [loading, setloading] = useState(false)
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [errors, setErrors] = useState({
+//     name: '',
+//     mobileNumber: '',
+//     username: '',
+//     password: '',
+//     confirmPassword: '',
+//   });
+//   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+//   const navigate = useNavigate();
+//   const isValid = !Object.values(errors).includes(true);
+
+//   // Validation function
+//   const validate = () => {
+//     const newErrors = {};
+
+//     if (!name.trim()) {
+//       newErrors.name = 'Name is required';
+//     }
+//     if (!userName.trim()) {
+//       newErrors.username = 'Username is required';
+//     }
+
+//     if (!mobilenumber) {
+//       newErrors.mobileNumber = 'Mobile number is required';
+//     } else if (!/^\d{10}$/.test(mobilenumber)) {
+//       newErrors.mobileNumber = 'Mobile number must be 10 digits';
+//     }
+
+//     if (!passWord.trim()) {
+//       newErrors.passWord = 'Password is required';
+//     }
+
+//     if (passWord !== confirmPassword) {
+//       newErrors.confirmPassword = 'Passwords do not match';
+//     }
+
+//     setErrors(newErrors);
+
+//     // Return true if no errors
+//     return Object.keys(newErrors).length === 0;
+//   };
+
+//   //FUNCTION TO HANDLE INPUT MOBILE NUMBER LENGTH SHOULD NOT EXCEED 10 AND SAVING THAT NUMBER INTO STATE
+//   const handleNumber = (e) => {
+//     const { value } = e.target;
+
+//     // Check if the length is less than or equal to 10
+//     if (value.length <= 10) {
+//       setmobileNumber(value);
+//     }
+//   };
+
+//   //FUNCTION TO SHOW AND HIDE PASSWORD ON CHECKBOX CLICK
+//   const handleCheckboxChange = () => {
+//     setShowPassword(prevState => !prevState);
+//   }
+
+//   //FUNCTION TO HANDLE SIGNUP
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setloading(true);
+//     if (validate()) {
+//       try {
+//         const response = await axios.post(`http://192.168.3.14:5000/api/register`, { Name: name, Mobilenumber: mobilenumber, Username: userName, Password: passWord });
+//         // const response = await axios.post(`http://192.168.1.10:5000/api/register`, { Name: name, Mobilenumber: mobilenumber, Username: userName, Password: passWord });
+
+//         setMessage(response.data.message);
+//         if (response.status === 201) {
+//           await delay(2000);
+//           Swal.fire({
+//             position: "center",
+//             icon: "success",
+//             title: "New user registered successfully",
+//             footer: 'Redireting to login page',
+//             showConfirmButton: false,
+//             timer: 2000,
+//           });
+//           setloading(false)
+//           navigate('/');
+//         }
+//       } catch (error) {
+//         await delay(1000);
+//         setMessage(error.response.data.error);
+//         setloading(false);
+//       }
+//     } else {
+//       setloading(false)
+//     }
+//   };
+
+//   return (
+//     <div className='mainSignup'>
+
+//       {loading ? (
+//         <Loader />
+//       ) : (<div className='signUpDiv'>
+//         <div className='formToSignUp'>
+//           <>
+//             <form className="form" onSubmit={handleSubmit}>
+//               <p className="title">Signup </p>
+//               <div className="flex">
+//                 <label>
+//                   <input
+//                     className="input"
+//                     type="text"
+//                     placeholder="Enter your name"
+//                     required=""
+//                     onChange={(e) => {
+//                       setName(e.target.value)
+//                     }} />
+//                   <span style={{ "color": "black" }}>Name</span>
+//                   {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
+//                 </label>
+
+//                 <label>
+//                   <input
+//                     className="input"
+//                     type="number"
+//                     placeholder="Enter your mobile number"
+//                     required=""
+//                     onChange={handleNumber}
+//                     value={mobilenumber} />
+//                   <span style={{ "color": "black" }} >Mobile Number</span>
+//                   {errors.mobileNumber && <p style={{ color: 'red' }}>{errors.mobileNumber}</p>}
+//                 </label>
+
+//               </div>
+//               <label>
+//                 <input
+//                   className="input"
+//                   type="text"
+//                   placeholder="Enter your username"
+//                   onChange={(e) => {
+//                     setuserName(e.target.value)
+//                   }} />
+//                 <span style={{ "color": "black" }}>Username</span>
+//                 {errors.username && <p style={{ color: 'red' }}>{errors.username}</p>}
+//               </label>
+
+//               <label>
+//                 <input
+//                   className="input"
+//                   type={showPassword ? 'text' : 'password'}
+//                   placeholder="Enter your password"
+//                   onChange={(e) => {
+//                     setpassWord(e.target.value)
+//                   }}
+//                 />
+//                 <span style={{ "color": "black" }}>Password</span>
+//                 {errors.passWord && <p style={{ color: 'red' }}>{errors.passWord}</p>}
+//               </label>
+
+//               <label>
+//                 <input
+//                   className="input"
+//                   type={showPassword ? 'text' : 'password'}
+//                   placeholder="Re-Enter your password"
+//                   onChange={(e) => {
+//                     setconfirmpassword(e.target.value)
+//                   }} />
+//                 <span style={{ "color": "black" }}>Confirm password</span>
+//                 {errors.passWord && <p style={{ color: 'red' }}>{errors.passWord}</p>}
+//               </label>
+
+//               <input type='checkbox' className='checkBox' checked={showPassword} onChange={handleCheckboxChange} /><span className='showPassword'>Show Password</span>
+
+//               <button
+//                 className="submit"
+//                 type='submit'
+//                 disabled={!isValid}
+//               >
+//                 Submit
+//               </button>
+//               {message && <p style={{ color: 'red', textAlign: "center" }}>{message}</p>}
+//               <p className="signin">
+//                 Already have an acount ?<Link to="/">Back to login</Link>{" "}
+//               </p>
+//             </form>
+//           </>
+//         </div>
+//         <div className='blankSpace'>
+//         </div>
+//       </div>)}
+//     </div>
+//   )
+// }
+
+// export default Signup
