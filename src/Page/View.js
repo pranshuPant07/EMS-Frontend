@@ -10,9 +10,9 @@ function View(props) {
     useEffect(() => {
         const fetchEmployee = async () => {
             try {
-                // const response = await axios.get(`http://192.168.3.14:5000/api/employees/${id}`);
+                const response = await axios.get(`http://192.168.3.14:5000/api/employees/${id}`);
 
-                const response = await axios.get(`http://192.168.1.10:5000/api/employees/${id}`);
+                // const response = await axios.get(`http://192.168.1.10:5000/api/employees/${id}`);
                 setEmployees(response.data);
             } catch (error) {
                 console.error('Error fetching employee', error);
@@ -34,8 +34,8 @@ function View(props) {
                             {employees.Photo && (
                                 // eslint-disable-next-line jsx-a11y/img-redundant-alt
                                 <img
-                                    // src={`http://192.168.3.14:5000/${employees.Photo}`}
-                                    src={`http://192.168.1.10:5000/${employees.Photo}`}
+                                    src={`http://192.168.3.14:5000/${employees.Photo}`}
+                                    // src={`http://192.168.1.10:5000/${employees.Photo}`}
                                     alt={`${employees.Name}'s photo`}
                                     onContextMenu={(e) => e.preventDefault()}
                                 />

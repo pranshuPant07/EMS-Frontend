@@ -186,7 +186,7 @@
 // // };
 
 
-// //FUNCTION TO VALIDATE INPUT FIELDS  
+// //FUNCTION TO VALIDATE INPUT FIELDS
 // // const validate = () => {
 // //   const newErrors = [];
 
@@ -474,7 +474,7 @@
 //   }
 // };
 
-// // FUNCTION TO DELETE EMPLOYEE DATA FROM DATABASE  
+// // FUNCTION TO DELETE EMPLOYEE DATA FROM DATABASE
 // const deletee = async (id) => {
 //   try {
 //     // await axios.delete(`http://192.168.3.14:5000/api/items/${id}`);
@@ -660,3 +660,259 @@
 //     }
 //   });
 // }
+
+
+// Handle file upload
+//   const onUpload = async () => {
+//     if (!state.file) {
+//       updateState({ message: 'Please choose a file first.' });
+//       return;
+//     }
+//     updateState({ loading: true, datalogout: false });
+//     try {
+//       updateState({ uploadModal: false, processing: true });
+//       await delay(1000);
+
+//       const formData = new FormData();
+//       formData.append('file', state.file);
+
+//       // const response = await axios.post('http://192.168.1.10:5000/upload', formData, {
+//       const response = await axios.post('http://192.168.3.14:5000/upload', formData, {
+//         headers: {
+//           'Content-Type': 'multipart/form-data',
+//         },
+//       });
+
+//       const { data } = response;
+//       if (data.invalidEmployees.length > 0) {
+//         updateState({ response: data.invalidEmployees, errorMessage: data.errorMessage || 'Some records are invalid or already exist', ErrorModal: true });
+//       } else {
+//         await delay(1200);
+//         Swal.fire({
+//           position: 'center',
+//           icon: 'success',
+//           title: 'Employee data has been saved',
+//           showConfirmButton: false,
+//           timer: 1200,
+//         });
+//         fetchuserData();
+//       }
+//     } catch (error) {
+//       Swal.fire({
+//         icon: 'error',
+//         title: 'Error',
+//         text: `Error uploading file: ${error.response?.data || error.message}`,
+//       });
+//     } finally {
+//       updateState({ loading: false, processing: false, datalogout: true, uploadModal: false, file: null, message: '' });
+//     }
+//   };
+
+
+// import React, { useState } from 'react'
+// import '../Style/FormToAdd.css'
+// import { formatDate } from '../Component/dateFormat';
+
+// function FormToAdd(props) {
+//   const [option, setOption] = useState('');
+
+//   //FUNCTION TO HANDLE MOBILE NUMBER LENGTH SHOULD NOT BE EXCEED 10 AND SAVING THAT NUMBER INTO STATE
+//   const handleChange = (e) => {
+//     const { value } = e.target;
+//     props.setErrors("");
+
+//     // Check if the length is less than or equal to 10 
+//     if (value.length <= 10) {
+//       props.setempMobileNumber(value);
+//     }
+//   }
+//   //FUNCTION TO HANDLE INPUT NAME AND SAVE THAT NAME INTO STATE
+//   const handleName = (e) => {
+//     props.setErrors("")
+//     props.setempName(e.target.value)
+//   }
+
+//   //OPTIONS TO SELECT FOR DEPARTMENT
+//   const options = [
+//     { value: '', label: 'Select Department' },
+//     { value: 'Manager', label: 'Manager' },
+//     { value: 'Admin Department', label: 'Admin Department' },
+//     { value: 'Maintenance Department', label: 'Maintenance Department' },
+//     { value: 'HR Department', label: 'HR Department' },
+//     { value: 'IT Department', label: 'IT Department' },
+//     { value: 'Support Department', label: 'Support Department' },
+//     { value: 'Sales Department', label: 'Sales Department' },
+//     { value: 'Helper', label: 'Helper' }
+//   ]
+
+//   //FUNCTION TO HANDLE SELECT DEPARTMENT FROM OPTIONS
+//   const handleOptionChange = (e) => {
+//     setOption(e.target.value)
+//     props.setOptions(e.target.value)
+//   }
+
+//   return (
+//     <div className='addPageMain'>
+//       <div className='inputAreaAgain'>
+//         <div className='headingAndButton'>
+//           <h1>ADD EMPLOYEE</h1>
+//           <button onClick={props.onClose}>X</button>
+//         </div>
+//         <div className='area'>
+//           <input type='text' placeholder='Enter your name' onChange={handleName} />
+//           {props.Errors.Namee && <p style={{ color: 'red' }}>{props.Errors.Namee}</p>}
+//           <input type='number' placeholder='Enter your mobile number' onChange={handleChange} value={props.Mobilenumber} />
+//           {props.Errors.mobileNumber && <p style={{ color: 'red' }}>{props.Errors.mobileNumber}</p>}
+//           <select
+//             id="select-input"
+//             value={option}
+//             onChange={handleOptionChange}
+//           >
+//             {options.map((option) => (
+//               <option key={option.value} value={option.value}>
+//                 {option.label}
+//               </option>
+//             ))}
+//           </select>
+//           <input type='file' placeholder='upload Image' name='image' accept='image/*' onChange={(e) => props.setPhoto(e.target.files[0])} />
+//           <input type='date' placeholder='Enter your date of join' onChange={(e) => { formatDate(props.setDate(e.target.value)) }} value={props.date} />
+//           {props.Errors && <p style={{ color: 'red' }}>{props.Errors}</p>}
+//           <button onClick={props.addData}>Add</button>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default FormToAdd
+
+
+
+// import React from 'react'
+// import './../Style/FormToEdit.css'
+// import { formatDate } from '../Component/dateFormat';
+
+// const EditUser = ({ onClose,
+//   setVerifyModal,
+//   setName,
+//   setMobileNumber,
+//   setDateOfJoin,
+//   setUpdatedPhoto,
+//   setUpdatedDepartment,
+//   Name,
+//   Mobilenumber,
+//   Dateofjoin,
+//   Errors,
+//   updatedDepartment,
+//   SetIsEditing,
+//   handleUpdates
+// }) => {
+
+//   //OPTIONS TO SELECT FOR DEPARTMENT
+//   const options = [
+//     { value: '', label: 'Select Department' },
+//     { value: 'Manager', label: 'Manager' },
+//     { value: 'Admin Department', label: 'Admin Department' },
+//     { value: 'Maintenance Department', label: 'Maintenance Department' },
+//     { value: 'HR Department', label: 'HR Department' },
+//     { value: 'IT Department', label: 'IT Department' },
+//     { value: 'Support Department', label: 'Support Department' },
+//     { value: 'Sales Department', label: 'Sales Department' },
+//     { value: 'Helper', label: 'Helper' }
+//   ]
+
+//   //FUNCTION TO HANDLE DATE AND CHANGING FORMAT OF DATE AND SAVING IT INTO STATE
+//   const handleDate = (e) => {
+//     const { value } = e.target;
+//     setDateOfJoin(formatDate(value))
+//   }
+
+//   //FUNCTION TO HANDLE NAME CHANGE AND SAVE IT INTO STATE
+//   const handleName = (e) => {
+//     const { value } = e.target;
+//     setName(value)
+//   }
+
+//   //FUNCTION TO HANDLE DEPARTMENT SELECT AND SAVE IT INTO STATE
+//   const handleOption = (e) => {
+//     const { value } = e.target;
+//     setUpdatedDepartment(value)
+//   }
+
+//   //FUNCTION TO HANDLE UPDATE CLICK
+//   const checkUpdate = (e) => {
+//     setVerifyModal(true);
+//     SetIsEditing(false);
+//   }
+
+//   //FUNCTION TO CONVERT DATE FORMAT
+//   function convertDateFormat(dateString) {
+//     // Create a date object from the string
+//     const date = new Date(dateString);
+
+//     // Check if the date is valid
+//     if (isNaN(date.getTime())) {
+//       return 'Invalid Date';
+//     }
+
+//     // Format the date as YYYY-MM-DD
+//     const year = date.getFullYear();
+//     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+//     const day = String(date.getDate()).padStart(2, '0');
+//     return `${year}-${month}-${day}`;
+
+
+//   }
+
+//   return (
+//     <div className='addPageMainn'>
+//       <div className='inputAreaAgainn'>
+//         <div className='headingAndButtonn'>
+//           <h1>Editing User's Data</h1>
+//           <button onClick={onClose}>X</button>
+//         </div>
+//         <div className='areaa'>
+//           <input placeholder='Enter employee name'
+//             value={Name}
+//             onChange={handleName}
+//           />
+//           {Errors.Namee && <p style={{ color: 'red' }}>{Errors.Namee}</p>}
+//           <input
+//             placeholder='Enter employee mobile number'
+//             disabled
+//             value={Mobilenumber}
+//           />
+//           {Errors.mobileNumber && <p style={{ color: 'red' }}>{Errors.mobileNumber}</p>}
+//           <input
+//             type='file'
+//             name='image'
+//             accept='image/*'
+//             placeholder='Upload your new photo'
+//             onChange={(e) => setUpdatedPhoto(e.target.files[0])}
+//           />
+//           <select
+//             id="select-input"
+//             value={updatedDepartment}
+//             onChange={handleOption}
+//           >
+//             {options.map((option) => (
+//               <option key={option.value} value={option.value}>
+//                 {option.label}
+//               </option>
+//             ))}
+//           </select>
+
+//           <input placeholder='Enter employee date of join'
+//             value={convertDateFormat(Dateofjoin)}
+//             type="date"
+//             onChange={handleDate}
+//           />
+//           {Errors && <p style={{ color: 'red' }}>{Errors}</p>}
+//           <button onClick={checkUpdate}>Update</button>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default EditUser

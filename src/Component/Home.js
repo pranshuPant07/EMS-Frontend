@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../Style/Home.css';
 import { Link, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 import Loader from './Loader';
 import axios from 'axios';
 
-function Home() {
+function Home({ setIsAuthenticated }) {
   const [state, setState] = useState({
     Username: '',
     Password: '',
@@ -16,8 +16,17 @@ function Home() {
     errors: ''
   });
 
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      navigate('/Form'); // Redirect to Form if already authenticated
+    }
+  }, [navigate]);
+
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 
   // Function to update state
   const updateState = (newState) => {
@@ -51,7 +60,8 @@ function Home() {
 
     if (validate()) {
       try {
-        const response = await axios.post('http://192.168.1.10:5000/api/loginData', {
+        const response = await axios.post('http://192.168.3.14:5000/api/loginData', {
+          // const response = await axios.post('http://192.168.1.10:5000/api/loginData', {
           Username: state.Username,
           Password: state.Password
         });
@@ -60,6 +70,7 @@ function Home() {
         if (token) {
           updateState({ errors: '', success: '' });
           localStorage.setItem('authToken', token);
+          setIsAuthenticated(true);
           await delay(2000);
           updateState({ loading: false });
 
@@ -68,7 +79,6 @@ function Home() {
             text: "Login Successful",
             icon: "success"
           });
-
           navigate('/Form', { replace: true });
         }
       } catch (error) {
@@ -119,7 +129,7 @@ function Home() {
                 }}
               />
               <span style={{ color: "black" }}>Password</span>
-              {state.errors.password && <p style={{ color: 'red' }}>{state.errors.password}</p>} 
+              {state.errors.password && <p style={{ color: 'red' }}>{state.errors.password}</p>}
             </label>
             <input
               type='checkbox'

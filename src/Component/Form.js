@@ -2,12 +2,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from 'react';
 import '../Style/Form.css'
-import FormToAdd from '../Page/FormToAdd';
 import Swal from 'sweetalert2';
 import axios from 'axios';
-import { formatDate } from './dateFormat';
 import { useNavigate } from 'react-router-dom';
-import EditUser from '../Page/EditUser';
 import 'remixicon/fonts/remixicon.css'
 import Loader from './Loader';
 import Pagination from './Pagination';
@@ -143,7 +140,8 @@ function Form() {
   // Fetch user data
   const fetchuserData = async () => {
     try {
-      const response = await axios.get("http://192.168.1.10:5000/api/users");
+      const response = await axios.get("http://192.168.3.14:5000/api/users");
+      // const response = await axios.get("http://192.168.1.10:5000/api/users");
       const data = await response.data;
       updateState({ Employee: data });
     } catch (error) {
@@ -151,9 +149,106 @@ function Form() {
     }
   };
 
-  // Close modal
-  const handleCloseModal = () => {
-    updateState({ isEditing: false, userID: null });
+  // Handle adding employee
+  const HandleAddEmp = (e) => {
+    e.stopPropagation();
+    updateState({ popupModal: true, mode: "Add" });
+  };
+
+  // Handle editing employee
+  const handleEditEmp = (e, id) => {
+    e.stopPropagation();
+    updateState({ userID: id, popupModal: true, mode: "Edit" });
+  };
+
+  // Handle exporting data
+  const handleExport = async () => {
+    updateState({ loading: true, datalogout: false });
+    Swal.fire({
+      title: "Do you want to download the file?",
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "EXCEL",
+      denyButtonText: `PDF`
+    }).then(async (result) => {
+      updateState({ loading: true });
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Done!",
+          text: "Your file will be available for download shortly.",
+          icon: "info"
+        });
+        await delay(3000);
+        axios({
+          url: 'http://192.168.3.14:5000/export/employees',
+          // url: 'http://192.168.1.10:5000/export/employees',
+          method: 'GET',
+          responseType: 'blob',
+        }).then((response) => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'employees.xlsx');
+          document.body.appendChild(link);
+          link.click();
+        }).catch((error) => {
+          console.error('Error exporting data:', error);
+        });
+        updateState({ loading: false, datalogout: true });
+      } else if (result.isDenied) {
+        updateState({ loading: true });
+        Swal.fire({
+          title: "Done!",
+          text: "Your file will be available for download shortly.",
+          icon: "info"
+        });
+        await delay(3000);
+        try {
+          // const response = await axios.get('http://192.168.1.10:5000/download-employees', {
+          const response = await axios.get('http://192.168.3.14:5000/download-employees', {
+            responseType: 'blob',
+          });
+
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'employees.pdf');
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        } catch (error) {
+          console.error('Error downloading the PDF:', error);
+        }
+        updateState({ loading: false, datalogout: true });
+      } else {
+        updateState({ loading: false, datalogout: true });
+      }
+    });
+  };
+
+  // Logout
+  const logout = (e) => {
+    updateState({ datalogout: false });
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to log out",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Logout"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        updateState({ loading: true });
+        localStorage.removeItem('authToken');
+        await delay(1500);
+        updateState({ loading: false });
+        navigate("/", { replace: true });
+      } else {
+        updateState({ datalogout: true });
+      }
+    });
   };
 
   // Handle delete
@@ -190,156 +285,12 @@ function Form() {
   // Delete employee data
   const deletee = async (id) => {
     try {
-      await axios.delete(`http://192.168.1.10:5000/api/items/${id}`);
+      // await axios.delete(`http://192.168.1.10:5000/api/items/${id}`);
+      await axios.delete(`http://192.168.3.14:5000/api/items/${id}`);
       fetchuserData();
     } catch (error) {
       console.error('There was an error deleting the item!', error);
     }
-  };
-
-  // Logout
-  const logout = (e) => {
-    updateState({ datalogout: false });
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You want to log out",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Logout"
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        updateState({ loading: true });
-        localStorage.removeItem('authToken');
-        await delay(1500);
-        updateState({ loading: false });
-        navigate("/", { replace: true });
-      } else {
-        updateState({ datalogout: true });
-      }
-    });
-  };
-
-  // Handle adding employee
-  const HandleAddEmp = (e) => {
-    e.stopPropagation();
-    updateState({ popupModal: true, mode: "Add" });
-  };
-
-  // Handle editing employee
-  const handleEditEmp = (e, id) => {
-    e.stopPropagation();
-    updateState({ userID: id, popupModal: true, mode: "Edit" });
-  };
-
-  // Handle file upload
-  const onUpload = async () => {
-    if (!state.file) {
-      updateState({ message: 'Please choose a file first.' });
-      return;
-    }
-    updateState({ loading: true, datalogout: false });
-    try {
-      updateState({ uploadModal: false, processing: true });
-      await delay(1000);
-
-      const formData = new FormData();
-      formData.append('file', state.file);
-
-      const response = await axios.post('http://192.168.1.10:5000/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      const { data } = response;
-      if (data.invalidEmployees.length > 0) {
-        updateState({ response: data.invalidEmployees, errorMessage: data.errorMessage || 'Some records are invalid or already exist', ErrorModal: true });
-      } else {
-        await delay(1200);
-        Swal.fire({
-          position: 'center',
-          icon: 'success',
-          title: 'Employee data has been saved',
-          showConfirmButton: false,
-          timer: 1200,
-        });
-        fetchuserData();
-      }
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: `Error uploading file: ${error.response?.data || error.message}`,
-      });
-    } finally {
-      updateState({ loading: false, processing: false, datalogout: true, uploadModal: false, file: null, message: '' });
-    }
-  };
-
-  // Handle exporting data
-  const handleExport = async () => {
-    updateState({ loading: true, datalogout: false });
-    Swal.fire({
-      title: "Do you want to download the file?",
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: "EXCEL",
-      denyButtonText: `PDF`
-    }).then(async (result) => {
-      updateState({ loading: true });
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: "Done!",
-          text: "Your file will be available for download shortly.",
-          icon: "info"
-        });
-        await delay(3000);
-        axios({
-          url: 'http://192.168.1.10:5000/export/employees',
-          method: 'GET',
-          responseType: 'blob',
-        }).then((response) => {
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', 'employees.xlsx');
-          document.body.appendChild(link);
-          link.click();
-        }).catch((error) => {
-          console.error('Error exporting data:', error);
-        });
-        updateState({ loading: false, datalogout: true });
-      } else if (result.isDenied) {
-        updateState({ loading: true });
-        Swal.fire({
-          title: "Done!",
-          text: "Your file will be available for download shortly.",
-          icon: "info"
-        });
-        await delay(3000);
-        try {
-          const response = await axios.get('http://192.168.1.10:5000/download-employees', {
-            responseType: 'blob',
-          });
-
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', 'employees.pdf');
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-          window.URL.revokeObjectURL(url);
-        } catch (error) {
-          console.error('Error downloading the PDF:', error);
-        }
-        updateState({ loading: false, datalogout: true });
-      } else {
-        updateState({ loading: false, datalogout: true });
-      }
-    });
   };
 
 
@@ -482,6 +433,8 @@ function Form() {
         </div>
 
       </div>
+
+      
       {state.popupModal && (
         <AddandUpdate
           mode={state.mode}
@@ -501,12 +454,16 @@ function Form() {
       {state.uploadModal && (
         <UploadMedia
           onClose={() => updateState({ uploadModal: false })}
-          onUpload={onUpload}
+          setUploadModal={(uploadModal) => updateState({ uploadModal })}
           message={state.message}
           setMessage={(message) => updateState({ message })}
           loading={state.loading}
           setLoading={(loading) => updateState({ loading })}
-          setFile={(file) => updateState({ file })}
+          setDatalogout={(datalogout) => updateState({ datalogout })}
+          errorModal={state.ErrorModal}
+          setErrorModal={(ErrorModal) => updateState({ ErrorModal })}
+          setResponse={(response) => updateState({ response })}
+          setErrorMessge={(errorMessage) => updateState({ errorMessage })}
         />
       )}
 

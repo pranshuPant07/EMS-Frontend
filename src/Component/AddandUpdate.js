@@ -32,7 +32,8 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
         if (userID && mode === "Edit") {
             const fetchUserDetails = async () => {
                 try {
-                    const response = await axios.get(`http://192.168.1.10:5000/api/employees/${userID}`);
+                    const response = await axios.get(`http://192.168.3.14:5000/api/employees/${userID}`);
+                    // const response = await axios.get(`http://192.168.1.10:5000/api/employees/${userID}`);
                     const user = response.data;
 
                     setInput({
@@ -148,7 +149,8 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
                 if (input.Photo) {
                     formData.append('photo', input.Photo);
                 }
-                await axios.post("http://192.168.1.10:5000/api/signup", formData, {
+                await axios.post("http://192.168.3.14:5000/api/signup", formData, {
+                // await axios.post("http://192.168.1.10:5000/api/signup", formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -190,7 +192,8 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
                 if (input.Photo) {
                     formData.append('photo', input.Photo);
                 }
-                await axios.put(`http://192.168.1.10:5000/update-user/${userID}`, formData);
+                // await axios.put(`http://192.168.1.10:5000/update-user/${userID}`, formData);
+                await axios.put(`http://192.168.3.14:5000/update-user/${userID}`, formData);
                 setTimeout(() => {
                     Swal.fire({ title: "SUCCESS", text: "Updated data has been saved", icon: "success" });
                     setDatalogout(true);
