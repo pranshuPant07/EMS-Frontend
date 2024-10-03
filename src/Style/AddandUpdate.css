@@ -102,6 +102,25 @@
     transform: scale(1.03);
 }
 
+.btn-click {
+    max-width: 50%;
+    background-color: #1976d2;
+    padding: 12px;
+    border-radius: 5px;
+    color: black;
+    border: none;
+    font-family: "Mukta", sans-serif;
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 16px;
+    margin-left: 25%;
+}
+
+.btn-click:hover {
+    background-color: #1976d2;
+    transform: scale(1.03);
+}
+
+
 @media only screen and (max-width: 480px) {
     .inputAreaAgain {
         width: 90%;

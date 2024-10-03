@@ -3,16 +3,24 @@ import './../Style/AddandUpdate.css';
 import { formatDate } from './dateFormat';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useForm } from 'react-hook-form';
 import { convertDateFormat } from './OtherFunctions';
 
-function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal, code, userID, fetchuserData, setCode }) {
-    const [input, setInput] = useState({
-        Name: '',
-        Mobilenumber: '',
-        Photo: null,
-        Dateofjoin: '',
-        Department: '',
-    });
+function AddandUpdate({ mode,
+    onClose,
+    setLoading,
+    setDatalogout,
+    setpopupModal,
+    userID,
+    fetchuserData }) {
+
+
+    const
+        { register,
+            handleSubmit,
+            setValue,
+            reset,
+            formState: { errors } } = useForm();
 
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -33,16 +41,13 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
             const fetchUserDetails = async () => {
                 try {
                     const response = await axios.get(`http://192.168.3.14:5000/api/employees/${userID}`);
-                    // const response = await axios.get(`http://192.168.1.10:5000/api/employees/${userID}`);
                     const user = response.data;
 
-                    setInput({
-                        Name: user.Name,
-                        Mobilenumber: user.Mobilenumber,
-                        Photo: user.Photo,
-                        Dateofjoin: user.Dateofjoin,
-                        Department: user.Department,
-                    });
+                    setValue('Name', user.Name);
+                    setValue('Mobilenumber', user.Mobilenumber);
+                    setValue('Photo', user.Photo);
+                    setValue('Dateofjoin', convertDateFormat(user.Dateofjoin));
+                    setValue('Department', user.Department);
                 } catch (error) {
                     console.error("Error fetching user details:", error);
                 }
@@ -50,111 +55,56 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
 
             fetchUserDetails();
         } else if (mode === "Add") {
-            toResetInput(); // Reset input when switching to Add mode
+            reset(); // Reset form when switching to Add mode
         }
-    }, [userID, mode]);
+    }, [userID, mode, reset, setValue]);
 
-    const toResetInput = () => {
-        setInput({
-            Name: "",
-            Mobilenumber: "",
-            Photo: null,
-            Dateofjoin: "",
-            Department: ""
-        });
-        setErrorMessage(''); // Reset errors too
-    };
-
-    const validate = () => {
-        setErrorMessage('');
-
-        if (!input.Name.trim()) {
+    const validate = (data) => {
+        const { Name, Mobilenumber, Dateofjoin, Department, Photo } = data;
+        if (!Name.trim() || !Mobilenumber || !Dateofjoin || !Department || !Photo) {
             setErrorMessage('All fields are required.');
             return false;
         }
-        if (!input.Mobilenumber) {
-            setErrorMessage('All fields are required.');
-            return false;
-        } else if (!/^\d{10}$/.test(input.Mobilenumber)) {
+        if (!/^\d{10}$/.test(Mobilenumber)) {
             setErrorMessage('Mobile number must be 10 digits.');
             return false;
         }
-        if (!input.Dateofjoin) {
-            setErrorMessage('All fields are required.');
-            return false;
-        }
-        if (!input.Department.trim()) {
-            setErrorMessage('All fields are required.');
-            return false;
-        }
-        if (!input.Photo) {
-            setErrorMessage('All fields are required.');
-            return false;
-        }
-
-        return true; // No errors
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setInput((prevInput) => ({
-            ...prevInput,
-            [name]: value,
-        }));
+        return true;
     };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        setInput((prevInput) => ({
-            ...prevInput,
-            Photo: file,
-        }));
-    };
-
-    const updateMobilenumber = (e) => {
-        const { value } = e.target;
-        if (/^\d*$/.test(value) && value.length <= 10) {
-            setInput((prevInput) => ({
-                ...prevInput,
-                Mobilenumber: value,
-            }));
+        if (!file) {
+            setErrorMessage("Photo is required")
+        } else {
+            setValue('Photo', file);
         }
     };
 
     const functiontoclose = () => {
-        toResetInput();
+        reset();
         onClose();
     };
 
-    const DateSelect = (e) => {
-        const input = e.target.value;
-        setInput((prevInput) => ({
-            ...prevInput,
-            Dateofjoin: formatDate(input)
-        }));
-    };
-
-    const HandleAddEmpl = async (e) => {
-        e.preventDefault();
-        setpopupModal(false);
+    const HandleAddEmpl = async (data) => {
         setDatalogout(false);
         setLoading(true);
         try {
-            if (validate()) {
+            if (validate(data)) {
                 const formData = new FormData();
-                formData.append('Name', input.Name);
-                formData.append('Mobilenumber', input.Mobilenumber);
-                formData.append('Department', input.Department);
-                formData.append('Dateofjoin', formatDate(input.Dateofjoin));
-                if (input.Photo) {
-                    formData.append('photo', input.Photo);
+                formData.append('Name', data.Name);
+                formData.append('Mobilenumber', data.Mobilenumber);
+                formData.append('Department', data.Department);
+                formData.append('Dateofjoin', formatDate(data.Dateofjoin));
+                if (data.Photo) {
+                    formData.append('photo', data.Photo);
                 }
                 await axios.post("http://192.168.3.14:5000/api/signup", formData, {
-                // await axios.post("http://192.168.1.10:5000/api/signup", formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+                setpopupModal(false);
                 setTimeout(() => {
                     Swal.fire({
                         position: 'center',
@@ -165,66 +115,58 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
                     });
                     setLoading(false);
                     setDatalogout(true);
-                    toResetInput(); // Reset fields after successful addition
+                    reset();
                 }, 2000);
             }
         } catch (error) {
             setDatalogout(true);
             setLoading(false);
-            setErrorMessage({ general: 'Error occurred' });
+            setErrorMessage(error.response.data.error)
         } finally {
             fetchuserData();
         }
     };
 
-    const HandleEditEmpl = async (e) => {
-        e.preventDefault();
-        setpopupModal(false);
+    const HandleEditEmpl = async (data) => {
         setDatalogout(false);
         setLoading(true);
 
         try {
-            if (validate()) {
+            if (validate(data)) {
                 const formData = new FormData();
-                formData.append('Name', input.Name);
-                formData.append('Dateofjoin', formatDate(input.Dateofjoin));
-                formData.append('Department', input.Department);
-                if (input.Photo) {
-                    formData.append('photo', input.Photo);
+                formData.append('Name', data.Name);
+                formData.append('Dateofjoin', formatDate(data.Dateofjoin));
+                formData.append('Department', data.Department);
+                if (data.Photo) {
+                    formData.append('photo', data.Photo);
                 }
-                // await axios.put(`http://192.168.1.10:5000/update-user/${userID}`, formData);
                 await axios.put(`http://192.168.3.14:5000/update-user/${userID}`, formData);
+                setpopupModal(false);
                 setTimeout(() => {
                     Swal.fire({ title: "SUCCESS", text: "Updated data has been saved", icon: "success" });
                     setDatalogout(true);
                     setLoading(false);
-                    toResetInput();
+                    fetchuserData();
+                    reset();
                 }, 2000);
+
             }
         } catch (error) {
             setDatalogout(true);
             setLoading(false);
-            setErrorMessage({ general: 'Error occurred' });
+            setErrorMessage(error.response.data.error)
         } finally {
             fetchuserData();
-            setCode("");
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (validate()) {
-            if (mode === "Add") {
-                HandleAddEmpl(e);
-            } else if (mode === 'Edit') {
-                HandleEditEmpl(e);
-            }
-        } else {
-            setDatalogout(true);
-            setLoading(false);
+    const onSubmit = (data) => {
+        if (mode === "Add") {
+            HandleAddEmpl(data);
+        } else if (mode === 'Edit') {
+            HandleEditEmpl(data);
         }
     };
-
 
     return (
         <div className='addPageMain'>
@@ -234,52 +176,51 @@ function AddandUpdate({ mode, onClose, setLoading, setDatalogout, setpopupModal,
                     <button onClick={functiontoclose}>X</button>
                 </div>
                 <div className='area'>
-                    <input
-                        value={input.Name}
-                        type='text'
-                        placeholder='Enter your name'
-                        name="Name"
-                        onChange={handleInputChange} />
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <input
+                            {...register('Name', { required: true })}
+                            type='text'
+                            placeholder='Enter your name'
+                        />
+                        {errors.Name && <span style={{ color: 'red' }}>Name is required</span>}
 
-                    <input
-                        type='number'
-                        value={input.Mobilenumber}
-                        placeholder='Enter your mobile number'
-                        onChange={updateMobilenumber}
-                    />
+                        <input
+                            type='number'
+                            {...register('Mobilenumber', { required: true, pattern: /^\d{10}$/ })}
+                            placeholder='Enter your mobile number'
+                            disabled={mode === 'Edit'}
+                        />
+                        {errors.Mobilenumber && <span style={{ color: 'red' }}>Mobile number must be 10 digits</span>}
 
-                    <select
-                        id="select-input"
-                        name="Department"
-                        onChange={handleInputChange}
-                        value={input.Department}
-                    >
-                        {options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
+                        <select
+                            {...register('Department', { required: true })}
+                        >
+                            {options.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.Department && <span style={{ color: 'red' }}>Department is required</span>}
 
-                    <input
-                        type='file'
-                        placeholder='upload Image'
-                        name='image'
-                        accept='image/*'
-                        onChange={handleFileChange}
-                    />
+                        <input
+                            type='file'
+                            placeholder='Upload Image'
+                            accept='image/*'
+                            onChange={handleFileChange}
+                        />
+                        {errors.Photo && <span style={{ color: 'red' }}>Photo is required</span>}
 
+                        <input
+                            type='date'
+                            value={setValue.Dateofjoin}
+                            {...register('Dateofjoin', { required: true })}
+                        />
+                        {errors.Dateofjoin && <span style={{ color: 'red' }}>Date of join is required</span>}
+                        {errorMessage && <p style={{ color: 'red', textAlign: "center", marginBottom: "14%" }}>{errorMessage}</p>}
 
-                    <input
-                        type='date'
-                        value={convertDateFormat(input.Dateofjoin)}
-                        placeholder='Enter your date of join'
-                        name='Dateofjoin'
-                        onChange={DateSelect} />
-
-                    {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-
-                    <button onClick={handleSubmit}>{mode === 'Edit' ? 'Update' : 'Add'}</button>
+                        <button type="submit" style={{ marginLeft: "25%" }}>{mode === 'Edit' ? 'Update' : 'Add'}</button>
+                    </form>
                 </div>
             </div>
         </div>
