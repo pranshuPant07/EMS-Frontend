@@ -17,8 +17,6 @@ import AddandUpdate from './AddandUpdate';
 function Form() {
   const [state, setState] = useState({
     modal: false,
-    Name: '',
-    Mobilenumber: '',
     Employee: [],
     photo: null,
     isEditing: false,

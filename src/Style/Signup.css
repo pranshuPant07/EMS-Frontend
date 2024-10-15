@@ -57,7 +57,7 @@
     background-color: white;
   }
   .input::placeholder{
-    color: #797878;
+    color: #797878; 
   }
   
   .message, 

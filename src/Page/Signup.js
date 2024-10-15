@@ -47,13 +47,13 @@ function Signup() {
             showConfirmButton: false,
             timer: 2000,
           });
-          setLoading(false); // Stop loading after showing the success message
+          setLoading(false);
           navigate('/');
         }, 2000);
       }
     } catch (error) {
       setMessage(error.response.data.error);
-      setLoading(false); // Stop loading on error
+      setLoading(false);
     }
   };
 
@@ -73,7 +73,9 @@ function Signup() {
                     className="input"
                     type="text"
                     placeholder="Enter your name"
-                    {...register('Name', { required: "Name is required" })}
+                    {...register('Name',
+                      { required: "Required" }
+                    )}
                   />
                   <span style={{ color: "black" }}>Name</span>
                   {errors.Name && <p style={{ color: "red" }}>{errors.Name.message}</p>}
@@ -85,14 +87,14 @@ function Signup() {
                     type="number"
                     placeholder="Enter your mobile number"
                     {...register('mobileNumber', {
-                      required: "Mobile Number is required",
+                      required: "Required",
                       maxLength: {
                         value: 10,
-                        message: "Mobile number must be 10 digits.",
+                        message: "10 digits are allowed",
                       },
                       minLength: {
                         value: 10,
-                        message: "Mobile number must be 10 digits.",
+                        message: "Min. 10 digits",
                       },
                     })}
                   />
@@ -106,7 +108,7 @@ function Signup() {
                   className="input"
                   type="text"
                   placeholder="Enter your username"
-                  {...register('userName', { required: "Username is required" })}
+                  {...register('userName', { required: "Required" })}
                 />
                 <span style={{ color: "black" }}>Username</span>
                 {errors.userName && <p style={{ color: "red" }}>{errors.userName.message}</p>}
@@ -118,7 +120,7 @@ function Signup() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   {...register('passWord', {
-                    required: "Password is required",
+                    required: "Required",
                     minLength: {
                       value: 10,
                       message: "Password length should be more than 10",

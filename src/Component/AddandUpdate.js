@@ -178,7 +178,9 @@ function AddandUpdate({ mode,
                 <div className='area'>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <input
-                            {...register('Name', { required: true })}
+                            {...register('Name',
+                                { required: true }
+                            )}
                             type='text'
                             placeholder='Enter your name'
                         />
@@ -186,14 +188,18 @@ function AddandUpdate({ mode,
 
                         <input
                             type='number'
-                            {...register('Mobilenumber', { required: true, pattern: /^\d{10}$/ })}
+                            {...register('Mobilenumber',
+                                { required: true, pattern: /^\d{10}$/ }
+                            )}
                             placeholder='Enter your mobile number'
                             disabled={mode === 'Edit'}
                         />
                         {errors.Mobilenumber && <span style={{ color: 'red' }}>Mobile number must be 10 digits</span>}
 
                         <select
-                            {...register('Department', { required: true })}
+                            {...register('Department',
+                                { required: true }
+                            )}
                         >
                             {options.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -214,7 +220,9 @@ function AddandUpdate({ mode,
                         <input
                             type='date'
                             value={setValue.Dateofjoin}
-                            {...register('Dateofjoin', { required: true })}
+                            {...register('Dateofjoin',
+                                { required: true }
+                            )}
                         />
                         {errors.Dateofjoin && <span style={{ color: 'red' }}>Date of join is required</span>}
                         {errorMessage && <p style={{ color: 'red', textAlign: "center", marginBottom: "14%" }}>{errorMessage}</p>}

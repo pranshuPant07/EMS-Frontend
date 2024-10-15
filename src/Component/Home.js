@@ -23,7 +23,7 @@ function Home({ setIsAuthenticated }) {
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (token) {
-      navigate('/Form'); // Redirect to Form if already authenticated
+      navigate('/Form'); // REDIRECT TO FORM IF ALREADY AUTHENTICATED
     }
   }, [navigate]);
 
@@ -60,9 +60,8 @@ function Home({ setIsAuthenticated }) {
       }
     } catch (error) {
       setApiError(error.response ? error.response.data.message : 'An unexpected error occurred.');
-      setLoading(false); // Stop loading on error
+      setLoading(false); 
     } finally {
-      // Ensure loading is stopped if login was not successful
       if (!setIsAuthenticated) {
         setLoading(false);
       }
