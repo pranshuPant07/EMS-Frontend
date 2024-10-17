@@ -9,6 +9,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
         processing: false,
         response: [],
     });
+    const API_LINK = "https://ems-backend-v3pb.onrender.com";
 
     const updateState = (newState) => {
         setState(prevState => ({ ...prevState, ...newState }));
@@ -49,7 +50,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
             const formData = new FormData();
             formData.append('file', state.file);
 
-            const response = await axios.post('http://192.168.3.14:5000/upload', formData, {
+            const response = await axios.post(`${API_LINK}/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

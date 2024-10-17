@@ -48,6 +48,8 @@ function Form() {
     popupModal: false,
   });
 
+  const API_LINK = "https://ems-backend-v3pb.onrender.com";
+
   const updateState = (newState) => {
     setState(prevState => ({ ...prevState, ...newState }));
   };
@@ -138,7 +140,7 @@ function Form() {
   // Fetch user data
   const fetchuserData = async () => {
     try {
-      const response = await axios.get("http://192.168.3.14:5000/api/users");
+      const response = await axios.get(`${API_LINK}/api/users`);
       // const response = await axios.get("http://192.168.1.10:5000/api/users");
       const data = await response.data;
       updateState({ Employee: data });
@@ -178,7 +180,7 @@ function Form() {
         });
         await delay(3000);
         axios({
-          url: 'http://192.168.3.14:5000/export/employees',
+          url: `${API_LINK}/export/employees`,
           // url: 'http://192.168.1.10:5000/export/employees',
           method: 'GET',
           responseType: 'blob',
@@ -202,8 +204,7 @@ function Form() {
         });
         await delay(3000);
         try {
-          // const response = await axios.get('http://192.168.1.10:5000/download-employees', {
-          const response = await axios.get('http://192.168.3.14:5000/download-employees', {
+          const response = await axios.get(`${API_LINK}/export/downloadEmpl`, {
             responseType: 'blob',
           });
 
@@ -283,8 +284,7 @@ function Form() {
   // Delete employee data
   const deletee = async (id) => {
     try {
-      // await axios.delete(`http://192.168.1.10:5000/api/items/${id}`);
-      await axios.delete(`http://192.168.3.14:5000/api/items/${id}`);
+      await axios.delete(`${API_LINK}/api/employees/${id}`);
       fetchuserData();
     } catch (error) {
       console.error('There was an error deleting the item!', error);
@@ -432,7 +432,7 @@ function Form() {
 
       </div>
 
-      
+
       {state.popupModal && (
         <AddandUpdate
           mode={state.mode}

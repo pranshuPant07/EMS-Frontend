@@ -14,6 +14,7 @@ function AddandUpdate({ mode,
     userID,
     fetchuserData }) {
 
+    const API_LINK = "https://ems-backend-v3pb.onrender.com";
 
     const
         { register,
@@ -35,12 +36,11 @@ function AddandUpdate({ mode,
         { value: 'Sales Department', label: 'Sales Department' },
         { value: 'Helper', label: 'Helper' }
     ];
-
     useEffect(() => {
         if (userID && mode === "Edit") {
             const fetchUserDetails = async () => {
                 try {
-                    const response = await axios.get(`http://192.168.3.14:5000/api/employees/${userID}`);
+                    const response = await axios.get(`${API_LINK}/api/employees/${userID}`);
                     const user = response.data;
 
                     setValue('Name', user.Name);
@@ -59,23 +59,10 @@ function AddandUpdate({ mode,
         }
     }, [userID, mode, reset, setValue]);
 
-    const validate = (data) => {
-        const { Name, Mobilenumber, Dateofjoin, Department, Photo } = data;
-        if (!Name.trim() || !Mobilenumber || !Dateofjoin || !Department || !Photo) {
-            setErrorMessage('All fields are required.');
-            return false;
-        }
-        if (!/^\d{10}$/.test(Mobilenumber)) {
-            setErrorMessage('Mobile number must be 10 digits.');
-            return false;
-        }
-        return true;
-    };
-
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) {
-            setErrorMessage("Photo is required")
+            setErrorMessage("Photo is required");
         } else {
             setValue('Photo', file);
         }
@@ -90,38 +77,39 @@ function AddandUpdate({ mode,
         setDatalogout(false);
         setLoading(true);
         try {
-            if (validate(data)) {
-                const formData = new FormData();
-                formData.append('Name', data.Name);
-                formData.append('Mobilenumber', data.Mobilenumber);
-                formData.append('Department', data.Department);
-                formData.append('Dateofjoin', formatDate(data.Dateofjoin));
-                if (data.Photo) {
-                    formData.append('photo', data.Photo);
-                }
-                await axios.post("http://192.168.3.14:5000/api/signup", formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                setpopupModal(false);
-                setTimeout(() => {
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Employee data has been saved',
-                        showConfirmButton: false,
-                        timer: 1200,
-                    });
-                    setLoading(false);
-                    setDatalogout(true);
-                    reset();
-                }, 2000);
+            const formData = new FormData();
+            formData.append('Name', data.Name);
+            formData.append('Mobilenumber', data.Mobilenumber);
+            formData.append('Department', data.Department);
+            formData.append('Dateofjoin', formatDate(data.Dateofjoin));
+            if (data.Photo) {
+                formData.append('photo', data.Photo);
             }
+
+            const response = await axios.post(`${API_LINK}/api/addEmployee`, formData);
+
+            // Log response data
+            console.log("Response from server:", response.data);
+
+            setpopupModal(false);
+            setTimeout(() => {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Employee data has been saved',
+                    showConfirmButton: false,
+                    timer: 1200,
+                });
+                setLoading(false);
+                setDatalogout(true);
+                reset();
+            }, 2000);
         } catch (error) {
             setDatalogout(true);
             setLoading(false);
-            setErrorMessage(error.response.data.error)
+            // Check if error.response is defined
+            console.error("Error response:", error.response);
+            setErrorMessage(error.response?.data?.error || 'An error occurred');
         } finally {
             fetchuserData();
         }
@@ -132,29 +120,26 @@ function AddandUpdate({ mode,
         setLoading(true);
 
         try {
-            if (validate(data)) {
-                const formData = new FormData();
-                formData.append('Name', data.Name);
-                formData.append('Dateofjoin', formatDate(data.Dateofjoin));
-                formData.append('Department', data.Department);
-                if (data.Photo) {
-                    formData.append('photo', data.Photo);
-                }
-                await axios.put(`http://192.168.3.14:5000/update-user/${userID}`, formData);
-                setpopupModal(false);
-                setTimeout(() => {
-                    Swal.fire({ title: "SUCCESS", text: "Updated data has been saved", icon: "success" });
-                    setDatalogout(true);
-                    setLoading(false);
-                    fetchuserData();
-                    reset();
-                }, 2000);
-
+            const formData = new FormData();
+            formData.append('Name', data.Name);
+            formData.append('Dateofjoin', formatDate(data.Dateofjoin));
+            formData.append('Department', data.Department);
+            if (data.Photo) {
+                formData.append('photo', data.Photo);
             }
+            await axios.put(`${API_LINK}/api/employees/${userID}`, formData);
+            setpopupModal(false);
+            setTimeout(() => {
+                Swal.fire({ title: "SUCCESS", text: "Updated data has been saved", icon: "success" });
+                setDatalogout(true);
+                setLoading(false);
+                fetchuserData();
+                reset();
+            }, 2000);
         } catch (error) {
             setDatalogout(true);
             setLoading(false);
-            setErrorMessage(error.response.data.error)
+            setErrorMessage(error.response.data.error);
         } finally {
             fetchuserData();
         }
@@ -196,7 +181,7 @@ function AddandUpdate({ mode,
                         />
                         {errors.Mobilenumber && <span style={{ color: 'red' }}>Mobile number must be 10 digits</span>}
 
-                        <select
+                        <select className='selectDepartment'
                             {...register('Department',
                                 { required: true }
                             )}
@@ -219,6 +204,7 @@ function AddandUpdate({ mode,
 
                         <input
                             type='date'
+                            className='dateArea'
                             value={setValue.Dateofjoin}
                             {...register('Dateofjoin',
                                 { required: true }

@@ -11,6 +11,7 @@ function Home({ setIsAuthenticated }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState('');
+  const API_LINK= "https://ems-backend-v3pb.onrender.com"
 
   const {
     register,
@@ -37,7 +38,7 @@ function Home({ setIsAuthenticated }) {
     setApiError('');
 
     try {
-      const response = await axios.post('http://192.168.3.14:5000/api/loginData', {
+      const response = await axios.post(`${API_LINK}/api/login`, {
         Username: data.userName,
         Password: data.Password,
       });
@@ -60,7 +61,7 @@ function Home({ setIsAuthenticated }) {
       }
     } catch (error) {
       setApiError(error.response ? error.response.data.message : 'An unexpected error occurred.');
-      setLoading(false); 
+      setLoading(false);
     } finally {
       if (!setIsAuthenticated) {
         setLoading(false);

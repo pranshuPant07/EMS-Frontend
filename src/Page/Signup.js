@@ -11,6 +11,7 @@ function Signup() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+    const API_LINK= "https://ems-backend-v3pb.onrender.com"
 
   const {
     register,
@@ -28,7 +29,7 @@ function Signup() {
   const onSubmit = async (data) => {
     setLoading(true); // Start loading
     try {
-      const response = await axios.post(`http://192.168.3.14:5000/api/register`, {
+      const response = await axios.post(`${API_LINK}/api/register`, {
         Name: data.Name,
         Mobilenumber: data.mobileNumber,
         Username: data.userName,
