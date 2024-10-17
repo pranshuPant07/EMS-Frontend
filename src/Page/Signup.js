@@ -11,7 +11,7 @@ function Signup() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-    const API_LINK= "https://ems-backend-v3pb.onrender.com"
+  const API_LINK = process.env.REACT_APP_API_URL;
 
   const {
     register,

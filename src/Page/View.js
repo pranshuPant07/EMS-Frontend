@@ -4,7 +4,7 @@ import axios from 'axios';
 
 function View(props) {
     const [employees, setEmployees] = useState([]);
-    const API_LINK= "https://ems-backend-v3pb.onrender.com";
+    const API_LINK = process.env.REACT_APP_API_URL;
 
     const id = props.selectedEmp;
 

@@ -9,7 +9,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
         processing: false,
         response: [],
     });
-    const API_LINK = "https://ems-backend-v3pb.onrender.com";
+    const API_LINK = process.env.REACT_APP_API_URL;
 
     const updateState = (newState) => {
         setState(prevState => ({ ...prevState, ...newState }));
