@@ -81,6 +81,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
             setMessage(`Error uploading file: ${error.response?.data || error.message}`);
         } finally {
             updateState({ processing: false, file: null });
+            setDatalogout(true);
         }
     };
 
