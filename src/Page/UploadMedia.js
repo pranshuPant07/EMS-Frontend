@@ -57,6 +57,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
             });
 
             const { data } = response;
+            console.log(data)
             if (data.invalidEmployees.length > 0) {
                 setErrorModal(true);
                 setErrorMessge(data.errorMessage || 'Some records are invalid or already exist');
@@ -91,7 +92,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
                     <button onClick={onClose}>X</button>
                 </div>
                 <div className='InputFeildForMedia'>
-                    <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
+                    <input name="file" type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
                     <p style={{ color: "red" }}>{message}</p>
                 </div>
                 <div className='BtnForUploadANDCancel'>

@@ -88,10 +88,10 @@ function AddandUpdate({ mode,
 
             const response = await axios.post(`${API_LINK}/api/addEmployee`, formData);
 
-            // Log response data
-            console.log("Response from server:", response.data);
 
+            console.log("Response from server:", response.data);
             setpopupModal(false);
+
             setTimeout(() => {
                 Swal.fire({
                     position: 'center',
@@ -103,7 +103,7 @@ function AddandUpdate({ mode,
                 setLoading(false);
                 setDatalogout(true);
                 reset();
-            }, 2000);
+            }, 1000);
         } catch (error) {
             setDatalogout(true);
             setLoading(false);

@@ -49,6 +49,7 @@ function Form() {
   });
 
   const API_LINK = process.env.REACT_APP_API_URL;
+  console.log(API_LINK);
 
   const updateState = (newState) => {
     setState(prevState => ({ ...prevState, ...newState }));
@@ -140,8 +141,7 @@ function Form() {
   // Fetch user data
   const fetchuserData = async () => {
     try {
-      const response = await axios.get(`${API_LINK}/api/users`);
-      // const response = await axios.get("http://192.168.1.10:5000/api/users");
+      const response = await axios.get(`${API_LINK}/api/employees`);
       const data = await response.data;
       updateState({ Employee: data });
     } catch (error) {
@@ -211,14 +211,16 @@ function Form() {
           const url = window.URL.createObjectURL(new Blob([response.data]));
           const link = document.createElement('a');
           link.href = url;
-          link.setAttribute('download', 'employees.pdf');
+          link.setAttribute('download', 'employees.pdf'); // consider dynamic filename if needed
           document.body.appendChild(link);
           link.click();
           link.remove();
           window.URL.revokeObjectURL(url);
         } catch (error) {
           console.error('Error downloading the PDF:', error);
+          alert('There was an error downloading the file. Please try again later.'); // User feedback
         }
+
         updateState({ loading: false, datalogout: true });
       } else {
         updateState({ loading: false, datalogout: true });
