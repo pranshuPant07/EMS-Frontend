@@ -63,7 +63,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
                 setErrorMessge(data.errorMessage || 'Some records are invalid or already exist');
                 setResponse(data.invalidEmployees);
                 setLoading(false);
-            } else {    
+            } else {
                 await delay(2000);
                 setLoading(false)
                 Swal.fire({
