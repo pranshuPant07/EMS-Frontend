@@ -12,7 +12,7 @@ function ErrorDisplay({ onClose, response, errorMessage }) {
                 </div>
                 <div className='FeildForDisplayError'>
                     <table style={{ margin: "0" }} className="table table-dark table-striped table-hover">
-                        <thead>
+                        <thead >
                             <tr style={{ textAlign: "center" }}>
                                 <th className='cenTer2' scope="col">S.No</th>
                                 <th className='cenTer2' scope="col">Name</th>
