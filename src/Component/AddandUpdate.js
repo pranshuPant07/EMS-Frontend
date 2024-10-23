@@ -57,7 +57,7 @@ function AddandUpdate({ mode,
         } else if (mode === "Add") {
             reset(); // Reset form when switching to Add mode
         }
-    }, [userID, mode, reset, setValue]);
+    }, [userID, mode, reset, setValue, API_LINK]);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
