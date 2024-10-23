@@ -465,6 +465,7 @@ function Form() {
           setErrorModal={(ErrorModal) => updateState({ ErrorModal })}
           setResponse={(response) => updateState({ response })}
           setErrorMessge={(errorMessage) => updateState({ errorMessage })}
+          setEmployee={(Employee)=>updateState({Employee})}
         />
       )}
 

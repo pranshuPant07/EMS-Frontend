@@ -3,7 +3,7 @@ import '../Style/UploadMedia.css';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading, setErrorModal, setResponse, setErrorMessge, setDatalogout }) {
+function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading, setErrorModal, setResponse, setErrorMessge, setDatalogout, setEmployee }) {
     const [state, setState] = useState({
         file: null,
         processing: false,
@@ -19,10 +19,10 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
 
     const fetchUserData = async () => {
         try {
-            // const response = await axios.get("http://192.168.1.10:5000/api/users");
-            const response = await axios.get("http://192.168.3.14:5000/api/users");
+            const response = await axios.get(`http://192.168.3.14:5000/api/employees`);
             const data = await response.data;
-            updateState({ Employee: data });
+            // updateState({ Employee: data });
+            setEmployee(data);
         } catch (error) {
             console.log(error);
         }
@@ -73,7 +73,6 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
                     showConfirmButton: false,
                     timer: 1200,
                 });
-                fetchUserData();
             }
         } catch (error) {
             setLoading(false)
@@ -82,6 +81,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
         } finally {
             updateState({ processing: false, file: null });
             setDatalogout(true);
+            fetchUserData();
         }
     };
 
