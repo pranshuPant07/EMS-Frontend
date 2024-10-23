@@ -19,7 +19,7 @@ function UploadMedia({ onClose, message, setUploadModal, setMessage, setLoading,
 
     const fetchUserData = async () => {
         try {
-            const response = await axios.get(`http://192.168.3.14:5000/api/employees`);
+            const response = await axios.get(`${API_LINK}/api/employees`);
             const data = await response.data;
             // updateState({ Employee: data });
             setEmployee(data);
