@@ -408,7 +408,6 @@ function Form() {
                             <button className='edit_Button'
                               onClick={(e) =>
                                 handleEditEmp(e, item._id)}
-                            // handleEditClick(e, item._id)
                             >Edit</button>
 
                             <button className='delete_Button'
