@@ -14,7 +14,7 @@ function AddandUpdate({ mode,
     userID,
     fetchuserData }) {
 
-    const API_LINK = "https://ems-backend-v3pb.onrender.com";
+    const API_LINK = process.env.REACT_APP_API_URL;
 
     const
         { register,

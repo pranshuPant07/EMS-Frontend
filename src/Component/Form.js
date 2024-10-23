@@ -49,7 +49,6 @@ function Form() {
   });
 
   const API_LINK = process.env.REACT_APP_API_URL;
-  console.log(API_LINK);
 
   const updateState = (newState) => {
     setState(prevState => ({ ...prevState, ...newState }));
