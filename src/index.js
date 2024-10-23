@@ -18,7 +18,7 @@ const App = () => {
         <Routes>
             <Route path="/" element={<Home setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/Signup" element={<Signup />} />
-            <Route path="/Form" element={isAuthenticated ? <Form /> : <Navigate to="/" />} />
+            <Route path="/" element={isAuthenticated ? <Form /> : <Navigate to="/" />} />
         </Routes>
     );
 };
